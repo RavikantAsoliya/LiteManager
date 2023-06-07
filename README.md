@@ -20,7 +20,7 @@ To use the Everything Download Manager, follow these steps:
 
 1. Clone the repository: `git clone https://github.com/RavikantAsoliya/LiteManager.git`
 2. Open the project in your preferred IDE or code editor.
-3. Run the application and start downloading files effortlessly
+3. Run the application
 
 
 ## Usage
