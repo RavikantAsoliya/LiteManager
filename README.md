@@ -16,7 +16,7 @@ LiteManager is a simple file management application built using C# and Windows F
 
 ## Installation
 
-To use the Everything Download Manager, follow these steps:
+To use the LiteManager, follow these steps:
 
 1. Clone the repository: `git clone https://github.com/RavikantAsoliya/LiteManager.git`
 2. Open the project in your preferred IDE or code editor.
