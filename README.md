@@ -14,6 +14,15 @@ LiteManager is a simple file management application built using C# and Windows F
 - **View Properties:** Quickly view detailed properties of files and folders, such as size, creation date, and file type.
 - **Navigation History Tracking:** LiteManager keeps track of your navigation history, allowing you to easily navigate back to previously visited directories. The application provides navigation buttons or keyboard shortcuts to go back and forth through your navigation history.
 
+## Installation
+
+To use the Everything Download Manager, follow these steps:
+
+1. Clone the repository: `git clone https://github.com/RavikantAsoliya/LiteManager.git`
+2. Open the project in your preferred IDE or code editor.
+3. Run the application and start downloading files effortlessly
+
+
 ## Usage
 
 To use the LiteManager application, follow these steps:
