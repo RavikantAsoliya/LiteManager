@@ -79,7 +79,7 @@ namespace LiteManager
                         {
                             string name = textBox1.Text == "" || textBox1.Text == "Input a new name" ? fileName : textBox1.Text;
                             string fileExtension = extensionTextBox.Text == "" ? new FileInfo(fileName).Extension : extensionTextBox.Text;
-                            Console.WriteLine(Path.Combine(Path.GetDirectoryName(fileName), Path.GetFileNameWithoutExtension(name)) + startingNumber + (fileExtension.StartsWith(".") ? fileExtension : "." + fileExtension));
+                            File.Move(fileName, Path.Combine(Path.GetDirectoryName(fileName), Path.GetFileNameWithoutExtension(name)) + startingNumber + (fileExtension.StartsWith(".") ? fileExtension : "." + fileExtension));
                             intValue++;
                             startingNumber = intValue.ToString().PadLeft(startingNumber.Length, '0');
                         }
@@ -104,7 +104,7 @@ namespace LiteManager
                         {
                             string prefix = textBox3.Text == "" || textBox3.Text == "Input a new name" ? "" : textBox3.Text;
                             string fileExtension = extensionTextBox.Text == "" ? new FileInfo(fileName).Extension : extensionTextBox.Text;
-                            Console.WriteLine(Path.Combine(Path.GetDirectoryName(fileName), prefix + Path.GetFileNameWithoutExtension(fileName)) + (fileExtension.StartsWith(".") ? fileExtension : "." + fileExtension));
+                            File.Move(fileName, Path.Combine(Path.GetDirectoryName(fileName), prefix + Path.GetFileNameWithoutExtension(fileName)) + (fileExtension.StartsWith(".") ? fileExtension : "." + fileExtension));
                         }
                     }
                     catch (Exception ex)
