@@ -55,7 +55,7 @@ The LiteManager application is open-source and released under the [MIT License](
 
 ## Acknowledgements
 
-The LiteManager application is developed by [Your Name] and is based on the LiteManager project available at [GitHub Repository URL].
+The LiteManager application is developed by [Ravikant Asoliya](https://www.github.com/RavikantAsoliya) and is based on the LiteManager project available at https://github.com/RavikantAsoliya/LiteManager.git.
 
 ## Contact
 
