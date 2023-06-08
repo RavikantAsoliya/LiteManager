@@ -514,6 +514,21 @@ namespace LiteManager
             }
         }
 
+        private void BatchRenameToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            List<string> files = new List<string>();
+            if (fileListView.SelectedItems.Count > 1)
+            {
+                ListView.SelectedListViewItemCollection selecteditems = fileListView.SelectedItems;
+                foreach (ListViewItem item in selecteditems)
+                {
+                    files.Add(Path.Combine(addressBar.Text, item.Text));
+                }
+            }
+            BatchRenameForm batchRename = new BatchRenameForm(files);
+            batchRename.ShowDialog();
+        }
+
         #region Drag and Drop files and folders
 
         private void ListView_DragEnter(object sender, DragEventArgs e)
@@ -587,5 +602,6 @@ namespace LiteManager
         #endregion
 
         #endregion
+
     }
 }
