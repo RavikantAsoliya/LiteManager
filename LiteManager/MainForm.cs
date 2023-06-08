@@ -398,11 +398,6 @@ namespace LiteManager
                     addressBar.Text = selectedItemPath;
                 }
             }
-            ListViewItem listItem = new ListViewItem(fileListView.Name)
-            {
-                ForeColor = Color.Black,  // Set appropriate forecolor
-                BackColor = Color.White
-            };
         }
 
         private void OpenToolStripMenuItem_Click(object sender, EventArgs e)
