@@ -81,7 +81,12 @@ namespace LiteManager
                     listItem.SubItems.Add("Folder");
                     listItem.SubItems.Add("");
                     listItem.SubItems.Add(item.LastWriteTime.ToString());
-                    listItem.Tag = item.FullName;
+                    Dictionary<string, string> dict = new Dictionary<string, string>
+                    {
+                        {"FullName", item.FullName },
+                        {"Type", "Folder" }
+                    };
+                    listItem.Tag = dict;
                     fileListView.Items.Add(listItem);
                 }
 
@@ -91,7 +96,12 @@ namespace LiteManager
                     listItem.SubItems.Add("File");
                     listItem.SubItems.Add(item.Length.ToString());
                     listItem.SubItems.Add(item.LastWriteTime.ToString());
-                    listItem.Tag = item.FullName;
+                    Dictionary<string, string> dict = new Dictionary<string, string>
+                    {
+                        {"FullName", item.FullName },
+                        {"Type", "File" }
+                    };
+                    listItem.Tag = dict;
                     fileListView.Items.Add(listItem);
                 }
 
@@ -101,20 +111,6 @@ namespace LiteManager
             {
                 MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-        }
-
-        private string GetSelectedPath()
-        {
-            if (fileListView.SelectedItems.Count > 0)
-            {
-                string selectedPath = fileListView.FocusedItem.Tag as string;
-                if (!string.IsNullOrEmpty(selectedPath))
-                {
-                    return selectedPath;
-                }
-            }
-
-            return null;
         }
 
         private void AddDirectories(TreeNode parentNode)
@@ -152,7 +148,7 @@ namespace LiteManager
         {
             if (fileListView.SelectedItems.Count > 0)
             {
-                clipboardPath = fileListView.SelectedItems[0].Tag.ToString();
+                clipboardPath = ((Dictionary<string, string>)fileListView.SelectedItems[0].Tag)["FullName"].ToString();
                 isCutOperation = false;
             }
         }
@@ -161,7 +157,7 @@ namespace LiteManager
         {
             if (fileListView.SelectedItems.Count > 0)
             {
-                clipboardPath = fileListView.SelectedItems[0].Tag.ToString();
+                clipboardPath = ((Dictionary<string, string>)fileListView.SelectedItems[0].Tag)["FullName"].ToString();
                 isCutOperation = true;
             }
         }
@@ -219,38 +215,9 @@ namespace LiteManager
         // TODO: Perform rename with overwrite, skip, or rename with number, with another design like Windows 10 "RenameForm" form.
         private void RenameToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            string selectedPath = GetSelectedPath();
-
-            if (!string.IsNullOrEmpty(selectedPath))
+            if (fileListView.SelectedItems.Count > 0)
             {
-                using (var inputDialog = new InputDialogForm())
-                {
-                    inputDialog.Text = "Rename";
-                    inputDialog.lblPrompt.Text = "Enter the new name:";
-                    inputDialog.textBox.Text = Path.GetFileName(selectedPath);
-
-                    if (inputDialog.ShowDialog() == DialogResult.OK)
-                    {
-                        string newDirectoryName = inputDialog.textBox.Text;
-
-                        // Perform the rename operation
-                        if (!string.IsNullOrEmpty(newDirectoryName))
-                        {
-                            string parentDirectory = Directory.GetParent(selectedPath).FullName;
-                            string newDirectoryPath = Path.Combine(parentDirectory, newDirectoryName);
-
-                            try
-                            {
-                                Directory.Move(selectedPath, newDirectoryPath);
-                                PopulateListView(currentDirectory);
-                            }
-                            catch (Exception ex)
-                            {
-                                MessageBox.Show($"Failed to rename folder: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            }
-                        }
-                    }
-                }
+                fileListView.SelectedItems[0].BeginEdit();
             }
         }
 
@@ -259,7 +226,7 @@ namespace LiteManager
             if (fileListView.SelectedItems.Count > 0)
             {
                 ListViewItem selectedItem = fileListView.SelectedItems[0];
-                string selectedItemPath = selectedItem.Tag.ToString();
+                string selectedItemPath = ((Dictionary<string, string>)fileListView.SelectedItems[0].Tag)["FullName"].ToString();
                 string selectedFileName = Path.GetFileName(selectedItemPath);
                 var result = MessageBox.Show($"Are you sure you want to delete '{selectedFileName}'?", "Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
                 if (result == DialogResult.Yes)
@@ -333,7 +300,7 @@ namespace LiteManager
         {
             if (fileListView.SelectedItems.Count > 0)
             {
-                string selectedItemPath = fileListView.SelectedItems[0].Tag.ToString();
+                string selectedItemPath = ((Dictionary<string, string>)fileListView.SelectedItems[0].Tag)["FullName"].ToString();
                 if (File.Exists(selectedItemPath))
                 {
                     using (var propertiesDialog = new PropertiesDialog(selectedItemPath))
@@ -387,7 +354,7 @@ namespace LiteManager
         {
             if (fileListView.SelectedItems.Count > 0)
             {
-                string selectedItemPath = fileListView.SelectedItems[0].Tag.ToString();
+                string selectedItemPath = ((Dictionary<string, string>)fileListView.SelectedItems[0].Tag)["FullName"].ToString();
                 if (File.Exists(selectedItemPath))
                 {
                     System.Diagnostics.Process.Start(selectedItemPath);
@@ -404,7 +371,7 @@ namespace LiteManager
         {
             if (fileListView.SelectedItems.Count > 0)
             {
-                string selectedItemPath = fileListView.SelectedItems[0].Tag.ToString();
+                string selectedItemPath = ((Dictionary<string, string>)fileListView.SelectedItems[0].Tag)["FullName"].ToString();
                 if (File.Exists(selectedItemPath))
                 {
                     Process.Start(selectedItemPath);
@@ -603,5 +570,85 @@ namespace LiteManager
 
         #endregion
 
+        private bool IsFilenameValid(string filename)
+        {
+            // Define a list of illegal characters
+            char[] illegalChars = { '<', '>', ':', '"', '/', '\\', '|', '?', '*' };
+
+            // Check if the filename contains any illegal characters
+            foreach (char illegalChar in illegalChars)
+            {
+                if (filename.Contains(illegalChar.ToString()))
+                {
+                    MessageBox.Show("Filenames cannot contain any of the following characters:\r\n" + "\t\\/:*?\"<>|", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        private void fileListView_AfterLabelEdit(object sender, LabelEditEventArgs e)
+        {
+            string oldName = ((Dictionary<string, string>)fileListView.SelectedItems[0].Tag)["FullName"];
+            string newName = e.Label;
+            if (string.IsNullOrEmpty(newName) || newName == Path.GetFileName(oldName) || !IsFilenameValid(newName))
+            {
+                e.CancelEdit = true;
+            }
+            else
+            {
+                newName = Path.Combine(Path.GetDirectoryName(oldName), newName);
+                if (File.Exists(oldName))
+                {
+                    // Todo: Add Overwrite Functionality
+                    if (File.Exists(newName))
+                    {
+                        MessageBox.Show("There is a file with the same name in the current path！", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        e.CancelEdit = true;
+                    }
+                    else
+                    {
+                        File.Move(oldName, newName);
+                        ((Dictionary<string, string>)fileListView.SelectedItems[0].Tag)["FullName"] = newName;
+                    }
+                }
+                else if (Directory.Exists(oldName))
+                {
+                    if (Directory.Exists(newName))
+                    {
+                        MessageBox.Show("There is a folder with the same name in the current path！", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        e.CancelEdit = true;
+                    }
+                    else
+                    {
+                        Directory.Move(oldName, newName);
+                        ((Dictionary<string, string>)fileListView.SelectedItems[0].Tag)["FullName"] = newName;
+                        AddDirectories(driveTreeView.SelectedNode);
+                    }
+                }
+            }
+        }
+
+        private void MainForm_Resize(object sender, EventArgs e)
+        {
+            addressBar.Width = this.Width - 313;
+        }
+
+        private void MainForm_SizeChanged(object sender, EventArgs e)
+        {
+            addressBar.Width = this.Width - 313;
+        }
+
+        private void toolbarToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            topToolStrip.Visible = !topToolStrip.Visible;
+            toolbarToolStripMenuItem.Checked = !toolbarToolStripMenuItem.Checked;
+        }
+
+        private void statusbarToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            statusBar.Visible = !statusBar.Visible;
+            statusbarToolStripMenuItem.Checked = !statusbarToolStripMenuItem.Checked;
+        }
     }
 }
