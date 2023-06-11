@@ -47,7 +47,7 @@
             // textBox1
             // 
             this.textBox1.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox1.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
+            this.textBox1.ForeColor = System.Drawing.SystemColors.GrayText;
             this.textBox1.Location = new System.Drawing.Point(7, 11);
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(298, 23);
@@ -60,7 +60,7 @@
             // startNumberTextBox
             // 
             this.startNumberTextBox.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.startNumberTextBox.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
+            this.startNumberTextBox.ForeColor = System.Drawing.SystemColors.GrayText;
             this.startNumberTextBox.Location = new System.Drawing.Point(93, 41);
             this.startNumberTextBox.Name = "startNumberTextBox";
             this.startNumberTextBox.Size = new System.Drawing.Size(308, 23);
@@ -68,13 +68,14 @@
             this.startNumberTextBox.TabStop = false;
             this.startNumberTextBox.Text = "1,01,001...";
             this.startNumberTextBox.Enter += new System.EventHandler(this.StartNumberTextBox_Enter);
+            this.startNumberTextBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.StartNumberTextBox_KeyPress);
             this.startNumberTextBox.Leave += new System.EventHandler(this.StartNumberTextBox_Leave);
             // 
             // textBox3
             // 
             this.textBox3.Enabled = false;
             this.textBox3.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox3.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
+            this.textBox3.ForeColor = System.Drawing.SystemColors.GrayText;
             this.textBox3.Location = new System.Drawing.Point(7, 91);
             this.textBox3.Name = "textBox3";
             this.textBox3.Size = new System.Drawing.Size(254, 23);
@@ -112,7 +113,7 @@
             // 
             this.rbPlusOriginalFileName.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.rbPlusOriginalFileName.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.rbPlusOriginalFileName.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(122)))), ((int)(((byte)(122)))), ((int)(((byte)(122)))));
+            this.rbPlusOriginalFileName.ForeColor = System.Drawing.SystemColors.GrayText;
             this.rbPlusOriginalFileName.Location = new System.Drawing.Point(267, 91);
             this.rbPlusOriginalFileName.Name = "rbPlusOriginalFileName";
             this.rbPlusOriginalFileName.Size = new System.Drawing.Size(134, 24);
