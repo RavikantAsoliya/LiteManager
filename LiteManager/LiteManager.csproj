@@ -32,6 +32,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -52,6 +55,10 @@
     <Compile Include="BatchRenameForm.Designer.cs">
       <DependentUpon>BatchRenameForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Helper\FileTypeChecker.cs" />
+    <Compile Include="Helper\IconProvider.cs" />
+    <Compile Include="Helper\RecentFiles.cs" />
+    <Compile Include="Helper\SizeFormatter.cs" />
     <Compile Include="InputDialogForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -65,18 +72,18 @@
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
-    <Compile Include="PropertiesDialogForm.cs">
+    <Compile Include="PropertiesForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="PropertiesDialogForm.Designer.cs">
-      <DependentUpon>PropertiesDialogForm.cs</DependentUpon>
+    <Compile Include="PropertiesForm.Designer.cs">
+      <DependentUpon>PropertiesForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="PropertiesDialogForm.resx">
-      <DependentUpon>PropertiesDialogForm.cs</DependentUpon>
+    <EmbeddedResource Include="PropertiesForm.resx">
+      <DependentUpon>PropertiesForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -88,6 +95,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <None Include="app.manifest" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -112,6 +120,17 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\up.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="Shell32">
+      <Guid>{50A7E9B0-70EF-11D1-B75A-00A0C90564FE}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
