@@ -25,8 +25,7 @@ namespace LiteManager
     {
         #region Variables
 
-        private string currentDirectory = string.Empty;
-        //private string currentDirectory = "recent";
+        private string currentDirectory = "recent";
         private readonly List<string> clipboardPathList = new List<string>();
         private bool isCutOperation = false;
         private readonly Stack<string> backStack = new Stack<string>();
@@ -903,29 +902,6 @@ namespace LiteManager
                 PropertiesForm propertiesForm = new PropertiesForm(clipboardPathList);
                 propertiesForm.ShowDialog();
             }
-
-            /*if (fileListView.SelectedItems.Count > 0)
-            {
-                string selectedItemPath = ((Dictionary<string, string>)fileListView.SelectedItems[0].Tag)["FullName"].ToString();
-                if (File.Exists(selectedItemPath))
-                {
-                    using (var propertiesDialog = new PropertiesDialog(selectedItemPath))
-                    {
-                        propertiesDialog.ShowDialog();
-                    }
-                }
-                else if (Directory.Exists(selectedItemPath))
-                {
-                    using (var propertiesDialog = new PropertiesDialog(selectedItemPath))
-                    {
-                        propertiesDialog.ShowDialog();
-                    }
-                }
-            }
-            else
-            {
-
-            }*/
         }
 
 
@@ -939,12 +915,13 @@ namespace LiteManager
         /// <param name="e"></param>
         private void DriveTreeView_AfterSelect(object sender, TreeViewEventArgs e)
         {
-            // Check if the selected node's tag represents a DirectoryInfo object
+            // Check if the selected node's tag represents recent directory
             if (e.Node.Tag.ToString() == "recent")
             {
                 PopulateListView("recent");
             }
-            if (e.Node.Tag is DirectoryInfo directory)
+            // Check if the selected node's tag represents a DirectoryInfo object
+            else if (e.Node.Tag is DirectoryInfo directory)
             {
                 // Update the address bar text with the full path of the selected directory
                 addressBar.Text = directory.FullName;
@@ -962,6 +939,7 @@ namespace LiteManager
         /// <param name="e"></param>
         private void DriveTreeView_BeforeExpand(object sender, TreeViewCancelEventArgs e)
         {
+            // If tag of parent node is "recent" then do not add any child node
             if (e.Node.Tag.ToString() == "recent")
             {
                 return;
@@ -1040,7 +1018,7 @@ namespace LiteManager
         private void BackButton_Click(object sender, EventArgs e)
         {
             // Check if there are items in the backStack
-            if (backStack.Count > 0 && currentDirectory != "recent")
+            if (backStack.Count > 0 || currentDirectory == "recent")
             {
                 // Push the current directory to the forwardStack
                 forwardStack.Push(currentDirectory);
@@ -1067,7 +1045,7 @@ namespace LiteManager
         private void ForwardButton_Click(object sender, EventArgs e)
         {
             // Check if there are items in the forwardStack
-            if (forwardStack.Count > 0)
+            if (forwardStack.Count > 0 || currentDirectory == "recent")
             {
                 // Push the current directory to the backStack
                 backStack.Push(currentDirectory);
@@ -1124,18 +1102,18 @@ namespace LiteManager
                 {
                     addressBar.Text = currentDirectory;
                 }
-                // Check the directory exists
-                else if (!Directory.Exists(addressBar.Text))
-                {
-                    MessageBox.Show("Enter a valid path", "error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-                else
+                // Check the directory exists or adrresBar text is recent
+                else if (Directory.Exists(addressBar.Text) || addressBar.Text == "recent")
                 {
                     // Push the current directory to the backStack for navigation history
                     backStack.Push(currentDirectory);
 
                     // Navigate to the directory specified in the address bar
                     NavigateToDirectory(addressBar.Text);
+                }
+                else
+                {
+                    MessageBox.Show("Enter a valid path", "error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
 
             }
