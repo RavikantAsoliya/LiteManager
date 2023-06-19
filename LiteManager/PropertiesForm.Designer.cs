@@ -319,8 +319,8 @@
             this.MinimizeBox = false;
             this.Name = "PropertiesForm";
             this.Text = "Properties";
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.TestForm_FormClosing);
-            this.Load += new System.EventHandler(this.TestForm_LoadAsync);
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.PropertiesForm_FormClosing);
+            this.Load += new System.EventHandler(this.PropertiesForm_LoadAsync);
             this.propertiesTabControl.ResumeLayout(false);
             this.generalTabPage.ResumeLayout(false);
             this.generalTabPage.PerformLayout();

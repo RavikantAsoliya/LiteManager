@@ -63,10 +63,11 @@ namespace LiteManager
         private void PopulateTreeView()
         {
 
-            TreeNode recentFilesNode = driveTreeView.Nodes.Add("Recents");
-            recentFilesNode.Tag = "recent";
-            recentFilesNode.ImageIndex = (int)IconIndex.Recent;
-            recentFilesNode.SelectedImageIndex = (int)IconIndex.Recent;
+            TreeNode recentFilesNode = driveTreeView.Nodes.Add("Recents");  // Creates a new TreeNode and adds it to the driveTreeView
+            recentFilesNode.Tag = "recent";  // Sets the Tag property of the TreeNode to "recent"
+            recentFilesNode.ImageIndex = (int)IconIndex.Recent;  // Sets the ImageIndex property of the TreeNode to the index representing the "Recent" icon
+            recentFilesNode.SelectedImageIndex = (int)IconIndex.Recent;  // Sets the SelectedImageIndex property of the TreeNode to the index representing the "Recent" icon
+
 
             foreach (DriveInfo drive in DriveInfo.GetDrives()) // Iterate over the available drives
             {
@@ -179,74 +180,86 @@ namespace LiteManager
             //start data update
             fileListView.BeginUpdate();
 
-            //empty lvwFiles
+            //clear listview
             fileListView.Items.Clear();
+
             if (path == "recent")
             {
-                //Get an enumerated collection of paths to recently used files
-                var recentFiles = RecentFilesUtil.GetRecentFiles();
+                // Get recent files
+                var recentFiles = RecentFiles.GetRecentFiles();
 
                 foreach (string file in recentFiles)
                 {
                     if (File.Exists(file))
                     {
+                        // File exists
                         FileInfo fileInfo = new FileInfo(file);
 
+                        // Add file to list view
                         ListViewItem item = fileListView.Items.Add(fileInfo.Name);
 
-                        //exe file or no extension
                         if (fileInfo.Extension == ".exe" || fileInfo.Extension == "")
                         {
-                            //Obtain the corresponding icon of the file through the current system
+                            // Get file icon for executable or unknown file type
                             Icon fileIcon = IconProvider.GetIconByFileName(fileInfo.FullName);
 
-                            //Because different exe files generally have different icons, icons cannot be accessed by extension name, and icons should be accessed by file name
+                            // Add image to image list
                             imageList.Images.Add(fileInfo.Name, fileIcon);
 
+                            // Set image key for the item
                             item.ImageKey = fileInfo.Name;
                         }
-                        //Other files
                         else
                         {
                             if (!imageList.Images.ContainsKey(fileInfo.Extension))
                             {
+                                // Get file icon for other file types
                                 Icon fileIcon = IconProvider.GetIconByFileName(fileInfo.FullName);
 
-                                //Because files of the same type (except exe) have the same icon, icons can be accessed by extension
+                                // Add image to image list
                                 imageList.Images.Add(fileInfo.Extension, fileIcon);
                             }
 
+                            // Set image key for the item
                             item.ImageKey = fileInfo.Extension;
                         }
 
+                        // Set tag for the item
                         item.Tag = new Dictionary<string, string>
-                        {
-                            {"FullName", fileInfo.FullName},
-                            {"Type", "File" }
-                        };
+                {
+                    {"FullName", fileInfo.FullName},
+                    {"Type", "File" }
+                };
+
+                        // Set tooltip for the item
                         item.ToolTipText = $"Type: {FileTypeChecker.GetFileTypeByExtension(fileInfo.Extension.ToString())}\n" +
-                            $"Size: {SizeFormatter.FormatSize(fileInfo.Length)}\n" +
+                            $"Size: {SizeManager.FormatSize(fileInfo.Length)}\n" +
                             $"Date Modified: {fileInfo.LastWriteTime}";
+
+                        // Add sub-items
                         item.SubItems.Add(FileTypeChecker.GetFileTypeByExtension(fileInfo.Extension));
-                        item.SubItems.Add($"{SizeFormatter.FormatSize(fileInfo.Length)}");
+                        item.SubItems.Add($"{SizeManager.FormatSize(fileInfo.Length)}");
                         item.SubItems.Add(fileInfo.LastWriteTime.ToString());
                     }
                     else if (Directory.Exists(file))
                     {
+                        // Directory exists
                         DirectoryInfo dirInfo = new DirectoryInfo(file);
 
+                        // Add directory to list view
                         ListViewItem item = fileListView.Items.Add(dirInfo.Name, 3);
 
+                        // Set tag for the item
                         item.Tag = new Dictionary<string, string>
-                        {
-                            {"FullName", dirInfo.FullName},
-                            {"Type", "Folder" }
-                        };
+                {
+                    {"FullName", dirInfo.FullName},
+                    {"Type", "Folder" }
+                };
 
+                        // Add sub-items
                         item.SubItems.Add("Folder");
                         item.SubItems.Add("");
                         item.SubItems.Add(dirInfo.LastWriteTime.ToString());
-
                     }
                 }
             }
@@ -254,11 +267,12 @@ namespace LiteManager
             {
                 try
                 {
+                    // Get directories and files in the specified path
                     DirectoryInfo directoryInfo = new DirectoryInfo(path);
                     DirectoryInfo[] directoryInfos = directoryInfo.GetDirectories();
                     FileInfo[] fileInfos = directoryInfo.GetFiles();
 
-                    //Delete the icon of the exe file in listIcons(ImageList) to release the space of listIcons
+                    // Remove existing executable icons from image list
                     foreach (ListViewItem item in fileListView.Items)
                     {
                         if (item.Text.EndsWith(".exe"))
@@ -267,81 +281,89 @@ namespace LiteManager
                         }
                     }
 
-                    //list all folders
+                    // Add directories to list view
                     foreach (DirectoryInfo dirInfo in directoryInfos)
                     {
                         ListViewItem item = fileListView.Items.Add(dirInfo.Name, 3);
-                        //item.Tag = dirInfo.FullName;
-                        item.Tag = new Dictionary<string, string>
-                        {
-                            {"FullName", dirInfo.FullName},
-                            {"Type", "Folder" }
-                        };
 
+                        // Set tag for the item
+                        item.Tag = new Dictionary<string, string>
+                {
+                    {"FullName", dirInfo.FullName},
+                    {"Type", "Folder" }
+                };
+
+                        // Add sub-items
                         item.SubItems.Add("Folder");
                         item.SubItems.Add("");
                         item.SubItems.Add(dirInfo.LastWriteTime.ToString());
                     }
 
-                    //list all files
+                    // Add files to list view
                     foreach (FileInfo fileInfo in fileInfos)
                     {
                         ListViewItem item = fileListView.Items.Add(fileInfo.Name);
 
-                        //exe file or no extension
                         if (fileInfo.Extension == ".exe" || fileInfo.Extension == "")
                         {
-                            //Obtain the corresponding icon of the file through the current system
+                            // Get file icon for executable or unknown file type
                             Icon fileIcon = IconProvider.GetIconByFileName(fileInfo.FullName);
 
-                            //Because different exe files generally have different icons, icons cannot be accessed by extension name, and icons should be accessed by file name
+                            // Add image to image list
                             imageList.Images.Add(fileInfo.Name, fileIcon);
 
+                            // Set image key for the item
                             item.ImageKey = fileInfo.Name;
                         }
-                        //Other files
                         else
                         {
                             if (!imageList.Images.ContainsKey(fileInfo.Extension))
                             {
+                                // Get file icon for other file types
                                 Icon fileIcon = IconProvider.GetIconByFileName(fileInfo.FullName);
 
-                                //Because files of the same type (except exe) have the same icon, icons can be accessed by extension
+                                // Add image to image list
                                 imageList.Images.Add(fileInfo.Extension, fileIcon);
                             }
 
+                            // Set image key for the item
                             item.ImageKey = fileInfo.Extension;
                         }
-                        //item.Tag = fileInfo.FullName;
+
+                        // Set tag for the item
                         item.Tag = new Dictionary<string, string>
-                        {
-                            {"FullName", fileInfo.FullName},
-                            {"Type", "File" }
-                        };
+                {
+                    {"FullName", fileInfo.FullName},
+                    {"Type", "File" }
+                };
+
+                        // Set tooltip for the item
                         item.ToolTipText = $"Type: {FileTypeChecker.GetFileTypeByExtension(fileInfo.Extension.ToString())}\n" +
-                            $"Size: {SizeFormatter.FormatSize(fileInfo.Length)}\n" +
+                            $"Size: {SizeManager.FormatSize(fileInfo.Length)}\n" +
                             $"Date Modified: {fileInfo.LastWriteTime}";
+
+                        // Add sub-items
                         item.SubItems.Add(FileTypeChecker.GetFileTypeByExtension(fileInfo.Extension));
-                        item.SubItems.Add(SizeFormatter.FormatSize(fileInfo.Length));
+                        item.SubItems.Add(SizeManager.FormatSize(fileInfo.Length));
                         item.SubItems.Add(fileInfo.LastWriteTime.ToString());
                     }
-
                 }
                 catch (Exception e)
                 {
+                    // Display error message
                     MessageBox.Show(e.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
 
-            // Update the status label with the total count of folders and files
+            // Set count status label
             countToolStripStatusLabel.Text = fileListView.Items.Count == 1
                ? $"{fileListView.Items.Count} item   |"
                : $"{fileListView.Items.Count} items   |";
 
-            //end data update
+            // Enable ToolTip
             fileListView.ShowItemToolTips = true;
+            // End Data Update
             fileListView.EndUpdate();
-
         }
 
 
@@ -459,11 +481,11 @@ namespace LiteManager
         }
 
 
-
         #endregion
 
 
         #region System Methods
+
 
         // TODO: Dynamic Folder Refresh: Automated Updating for Instant Changes
         /// <summary>
@@ -1403,65 +1425,51 @@ namespace LiteManager
         }
 
 
+        /// <summary>
+        /// Updates the selected items status label based on the number of selected items.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void FileListView_SelectedIndexChanged(object sender, EventArgs e)
         {
+            // Update the selected items status label based on the number of selected items
             selectedItemsToolStripStatusLabel.Text = fileListView.SelectedItems.Count == 0
-                    ? ""
-                    : $"{fileListView.SelectedItems.Count} {(fileListView.SelectedItems.Count == 1 ? "item" : "items")}  selected   |";
+                ? "" // No items selected
+                : $"{fileListView.SelectedItems.Count} {(fileListView.SelectedItems.Count == 1 ? "item" : "items")}  selected   |"; // Display the count and pluralize "item" if necessary
         }
 
-        #endregion
 
-
-
+        /// <summary>
+        /// Show the tooltip for the item with additional information.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private async void FileListView_ItemMouseHover(object sender, ListViewItemMouseHoverEventArgs e)
         {
             if (e.Item != null)
             {
+                // Get the full path of the item
                 string path = ((Dictionary<string, string>)e.Item.Tag)["FullName"];
+
+                // Check if the path represents a directory
                 if (Directory.Exists(path))
                 {
-                    string folderSize = await CalculateSize(path);
+                    // Calculate the size of the folder asynchronously
+                    string folderSize = await SizeManager.GetSize(path);
+
+                    // Update the tooltip of the item with folder information
                     e.Item.ToolTipText = $"Type: Folder\n" +
                         $"Size: {folderSize}\n" +
                         $"Date Modified: {new DirectoryInfo(path).LastWriteTime}";
                 }
-
             }
         }
 
 
 
-        public async Task<string> CalculateSize(string folder)
-        {
-            long totalSize = 0;
-            await Task.Run(() =>
-            {
-                try
-                {
-                    Parallel.ForEach(Directory.EnumerateFiles(folder, "*", SearchOption.AllDirectories),
-                        new ParallelOptions { }, file =>
-                        {
-                            try
-                            {
-                                FileInfo fileInfo = new FileInfo(file);
-                                Interlocked.Add(ref totalSize, fileInfo.Length);
-                            }
-                            catch (Exception ex)
-                            {
-                                // Handle the exception if necessary
-                                Console.WriteLine($"Error: {ex.Message}");
-                            }
-                        });
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error: {ex.Message}");
-                }
 
-            });
-            return SizeFormatter.FormatSize(totalSize);
-        }
+
+        #endregion
     }
 
 }

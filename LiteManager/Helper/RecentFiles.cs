@@ -1,77 +1,72 @@
 ﻿using Shell32;
-using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
+using System;
+using System.Linq;
 
 namespace LiteManager.Helper
 {
-    //About the tools in the "recent" folder in the computer, Win+R, enter Recent to call out
-    class RecentFilesUtil
+    class RecentFiles
     {
-        //Obtain the target path (real path) of the shortcut according to the shortcut name (full path)
+        /// <summary>
+        /// Retrieves the target file path of a shortcut.
+        /// </summary>
+        /// <param name="shortcutFilename">The path of the shortcut file.</param>
+        /// <returns>The target file path of the shortcut.</returns>
         public static string GetShortcutTargetFilePath(string shortcutFilename)
         {
-            //Get WScript.Shell type
+            // Dynamically creates an instance of the WScript.Shell object
             var type = Type.GetTypeFromProgID("WScript.Shell");
-
-            //Create an instance of this type
             object instance = Activator.CreateInstance(type);
 
-            var result = type.InvokeMember("CreateShortCut", BindingFlags.InvokeMethod, null, instance, new object[] { shortcutFilename });
+            // Invokes the CreateShortcut method to create the shortcut object
+            var result = type.InvokeMember("CreateShortcut", BindingFlags.InvokeMethod, null, instance, new object[] { shortcutFilename });
 
-            //Get the target path (real path)
+            // Retrieves the TargetPath property from the shortcut object
             var targetFilePath = result.GetType().InvokeMember("TargetPath", BindingFlags.GetProperty, null, result, null) as string;
 
             return targetFilePath;
         }
 
-        //Get an enumerated collection of paths to recently used files
-        public static IEnumerable<string> GetRecentFilesorg()
-        {
-            //Get the Recent path
-            var recentFolder = Environment.GetFolderPath(Environment.SpecialFolder.Recent);
 
-            //Get the file name (full path) under the "Recent" folder of the computer
-            return from file in Directory.EnumerateFiles(recentFolder)
-
-                       //Only take shortcut type files
-                   where Path.GetExtension(file) == ".lnk"
-
-                   //Get the corresponding real path
-                   select GetShortcutTargetFilePath(file);
-        }
-        // Get an enumerated collection of paths to recently used files, filtering out duplicates
+        /// <summary>
+        /// Retrieves a collection of recent files by parsing .lnk files in the Recent folder and removes duplicates.
+        /// </summary>
+        /// <returns>A collection of unique recent file paths.</returns>
         public static IEnumerable<string> GetRecentFiles()
         {
-            // Get the Recent path
+            // Gets the path of the Recent folder
             var recentFolder = Environment.GetFolderPath(Environment.SpecialFolder.Recent);
 
-            // Get the file name (full path) under the "Recent" folder of the computer
+            // Selects the target file paths from .lnk files in the Recent folder
             var recentFiles = from file in Directory.EnumerateFiles(recentFolder)
-                                  // Only take shortcut type files
                               where Path.GetExtension(file) == ".lnk"
-                              // Get the corresponding real path
                               select GetShortcutTargetFilePath(file);
 
-            // Remove duplicates using Distinct
+            // Removes duplicate file paths
             var uniqueFiles = recentFiles.Distinct();
 
             return uniqueFiles;
         }
 
+
+        /// <summary>
+        /// Retrieves a collection of recent file paths by accessing the Recent folder using the Shell32 COM object.
+        /// </summary>
+        /// <returns>A collection of recent file paths.</returns>
         public static IEnumerable<string> GetRecentFilesShortcut()
         {
+            // Gets the path of the Recent folder
             var recentFolder = Environment.GetFolderPath(Environment.SpecialFolder.Recent);
+
+            // Creates an instance of the Shell32 COM object and accesses the Recent folder
             var shell = new Shell();
             var folder = shell.NameSpace(recentFolder);
 
             var recentFiles = new List<string>();
 
+            // Iterates through the items in the Recent folder and adds their paths to the collection
             foreach (FolderItem file in folder.Items())
             {
                 recentFiles.Add(file.Path);
@@ -81,3 +76,4 @@ namespace LiteManager.Helper
         }
     }
 }
+
