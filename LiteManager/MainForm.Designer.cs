@@ -61,6 +61,7 @@ namespace LiteManager
             this.toolbarToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusbarToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.itemCheckBoxesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.previewPaneToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusBar = new System.Windows.Forms.StatusStrip();
@@ -80,15 +81,21 @@ namespace LiteManager
             this.columnHeaderModified = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.fileListView = new System.Windows.Forms.ListView();
             this.splitter1 = new System.Windows.Forms.Splitter();
-            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.panelForImagePreview = new System.Windows.Forms.Panel();
+            this.pictureBoxPreview = new System.Windows.Forms.PictureBox();
+            this.splitter2 = new System.Windows.Forms.Splitter();
             this.contextMenuStrip.SuspendLayout();
             this.menuStrip.SuspendLayout();
             this.statusBar.SuspendLayout();
             this.topToolStrip.SuspendLayout();
+            this.panelForImagePreview.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxPreview)).BeginInit();
             this.SuspendLayout();
             // 
             // driveTreeView
             // 
+            this.driveTreeView.BackColor = System.Drawing.Color.White;
+            this.driveTreeView.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.driveTreeView.Dock = System.Windows.Forms.DockStyle.Left;
             this.driveTreeView.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.driveTreeView.ImageIndex = 0;
@@ -340,7 +347,8 @@ namespace LiteManager
             this.viewToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolbarToolStripMenuItem,
             this.statusbarToolStripMenuItem,
-            this.itemCheckBoxesToolStripMenuItem});
+            this.itemCheckBoxesToolStripMenuItem,
+            this.previewPaneToolStripMenuItem});
             this.viewToolStripMenuItem.Name = "viewToolStripMenuItem";
             this.viewToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
             this.viewToolStripMenuItem.Text = "View";
@@ -371,6 +379,14 @@ namespace LiteManager
             this.itemCheckBoxesToolStripMenuItem.Text = "Item Check Boxes";
             this.itemCheckBoxesToolStripMenuItem.Click += new System.EventHandler(this.ItemCheckBoxesToolStripMenuItem_Click);
             // 
+            // previewPaneToolStripMenuItem
+            // 
+            this.previewPaneToolStripMenuItem.CheckOnClick = true;
+            this.previewPaneToolStripMenuItem.Name = "previewPaneToolStripMenuItem";
+            this.previewPaneToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
+            this.previewPaneToolStripMenuItem.Text = "Preview Pane";
+            this.previewPaneToolStripMenuItem.Click += new System.EventHandler(this.PreviewPaneToolStripMenuItem_Click);
+            // 
             // helpToolStripMenuItem
             // 
             this.helpToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -382,8 +398,9 @@ namespace LiteManager
             // aboutToolStripMenuItem
             // 
             this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
+            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.aboutToolStripMenuItem.Text = "About";
+            this.aboutToolStripMenuItem.Click += new System.EventHandler(this.AboutToolStripMenuItem_Click);
             // 
             // statusBar
             // 
@@ -515,8 +532,10 @@ namespace LiteManager
             // 
             // fileListView
             // 
+            this.fileListView.Activation = System.Windows.Forms.ItemActivation.OneClick;
             this.fileListView.AllowDrop = true;
-            this.fileListView.AutoArrange = false;
+            this.fileListView.BackColor = System.Drawing.Color.White;
+            this.fileListView.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.fileListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnHeaderName,
             this.columnHeaderType,
@@ -529,10 +548,11 @@ namespace LiteManager
             this.fileListView.HideSelection = false;
             this.fileListView.LabelEdit = true;
             this.fileListView.Location = new System.Drawing.Point(233, 49);
-            this.fileListView.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.fileListView.Margin = new System.Windows.Forms.Padding(100, 3, 4, 3);
+            this.fileListView.MinimumSize = new System.Drawing.Size(200, 390);
             this.fileListView.Name = "fileListView";
             this.fileListView.ShowItemToolTips = true;
-            this.fileListView.Size = new System.Drawing.Size(751, 390);
+            this.fileListView.Size = new System.Drawing.Size(501, 390);
             this.fileListView.SmallImageList = this.imageList;
             this.fileListView.TabIndex = 1;
             this.fileListView.TileSize = new System.Drawing.Size(100, 100);
@@ -557,13 +577,47 @@ namespace LiteManager
             this.splitter1.TabIndex = 0;
             this.splitter1.TabStop = false;
             // 
+            // panelForImagePreview
+            // 
+            this.panelForImagePreview.BackColor = System.Drawing.Color.White;
+            this.panelForImagePreview.Controls.Add(this.pictureBoxPreview);
+            this.panelForImagePreview.Dock = System.Windows.Forms.DockStyle.Right;
+            this.panelForImagePreview.Location = new System.Drawing.Point(734, 49);
+            this.panelForImagePreview.MinimumSize = new System.Drawing.Size(200, 100);
+            this.panelForImagePreview.Name = "panelForImagePreview";
+            this.panelForImagePreview.Size = new System.Drawing.Size(250, 390);
+            this.panelForImagePreview.TabIndex = 0;
+            this.panelForImagePreview.Visible = false;
+            // 
+            // pictureBoxPreview
+            // 
+            this.pictureBoxPreview.BackColor = System.Drawing.Color.White;
+            this.pictureBoxPreview.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pictureBoxPreview.Location = new System.Drawing.Point(0, 0);
+            this.pictureBoxPreview.Name = "pictureBoxPreview";
+            this.pictureBoxPreview.Size = new System.Drawing.Size(250, 390);
+            this.pictureBoxPreview.TabIndex = 0;
+            this.pictureBoxPreview.TabStop = false;
+            this.pictureBoxPreview.SizeChanged += new System.EventHandler(this.PictureBoxPreview_SizeChanged);
+            // 
+            // splitter2
+            // 
+            this.splitter2.Dock = System.Windows.Forms.DockStyle.Right;
+            this.splitter2.Location = new System.Drawing.Point(732, 49);
+            this.splitter2.Name = "splitter2";
+            this.splitter2.Size = new System.Drawing.Size(2, 390);
+            this.splitter2.TabIndex = 0;
+            this.splitter2.TabStop = false;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(984, 461);
+            this.Controls.Add(this.splitter2);
             this.Controls.Add(this.splitter1);
             this.Controls.Add(this.fileListView);
+            this.Controls.Add(this.panelForImagePreview);
             this.Controls.Add(this.driveTreeView);
             this.Controls.Add(this.statusBar);
             this.Controls.Add(this.topToolStrip);
@@ -571,8 +625,9 @@ namespace LiteManager
             this.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.MainMenuStrip = this.menuStrip;
             this.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.MinimumSize = new System.Drawing.Size(700, 250);
             this.Name = "MainForm";
-            this.Text = "File Manager";
+            this.Text = "Lite Manager (A Simple and Lightweight FileManager)";
             this.Load += new System.EventHandler(this.MainForm_Load);
             this.SizeChanged += new System.EventHandler(this.MainForm_Resize);
             this.Resize += new System.EventHandler(this.MainForm_Resize);
@@ -583,6 +638,8 @@ namespace LiteManager
             this.statusBar.PerformLayout();
             this.topToolStrip.ResumeLayout(false);
             this.topToolStrip.PerformLayout();
+            this.panelForImagePreview.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxPreview)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -643,6 +700,9 @@ namespace LiteManager
         private ToolStripMenuItem tileToolStripMenuItem;
         private ToolStripMenuItem listToolStripMenuItem;
         private ToolStripMenuItem detailedInfoToolStripMenuItem;
-        private ToolTip toolTip1;
+        private Panel panelForImagePreview;
+        private PictureBox pictureBoxPreview;
+        private Splitter splitter2;
+        private ToolStripMenuItem previewPaneToolStripMenuItem;
     }
 }

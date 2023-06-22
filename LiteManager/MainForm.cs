@@ -1,6 +1,4 @@
-﻿using LiteManager.Helper;
-using LiteManager;
-using Shell32;
+﻿using Shell32;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -17,6 +15,10 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using LiteManager.Helper;
+using Microsoft.WindowsAPICodePack.Shell;
+using System.Drawing.Drawing2D;
+using LiteManager;
 
 namespace LiteManager
 {
@@ -30,12 +32,15 @@ namespace LiteManager
         private bool isCutOperation = false;
         private readonly Stack<string> backStack = new Stack<string>();
         private readonly Stack<string> forwardStack = new Stack<string>();
+        private readonly Bitmap noPreviewImage; // Default "No preview available" image
 
         #endregion
 
         public MainForm()
         {
             InitializeComponent();
+            // Create the "No preview available" image
+            noPreviewImage = GenerateNoPreviewImage();
         }
 
         public enum IconIndex
@@ -477,6 +482,196 @@ namespace LiteManager
                     listToolStripMenuItem.Checked = true;  // Check the List ToolStripMenuItem
                     break;
             }
+        }
+
+
+        #endregion
+
+
+        #region Preview Pane
+
+
+        /// <summary>
+        /// Checks if the given file extension corresponds to a video file.
+        /// </summary>
+        /// <param name="fileExtension">The file extension to check.</param>
+        /// <returns>True if the file extension represents a video file, false otherwise.</returns>
+        private bool IsVideoFile(string fileExtension)
+        {
+            // Define an array of video file extensions
+            string[] videoExtensions = { ".mp4", ".avi", ".mov", ".mkv" };
+
+            // Check if the given file extension is present in the videoExtensions array
+            // The StringComparer.OrdinalIgnoreCase parameter ensures case-insensitive comparison
+            return videoExtensions.Contains(fileExtension, StringComparer.OrdinalIgnoreCase);
+        }
+
+
+        /// <summary>
+        /// Checks if the given file extension corresponds to an image file.
+        /// </summary>
+        /// <param name="fileExtension">The file extension to check.</param>
+        /// <returns>True if the file extension represents an image file, false otherwise.</returns>
+        private bool IsImageFile(string fileExtension)
+        {
+            // Define an array of image file extensions
+            string[] imageExtensions = { ".jpg", ".jpeg", ".png", ".gif", ".bmp" };
+
+            // Check if the given file extension is present in the imageExtensions array
+            // The StringComparer.OrdinalIgnoreCase parameter ensures case-insensitive comparison
+            return imageExtensions.Contains(fileExtension, StringComparer.OrdinalIgnoreCase);
+        }
+
+
+        //TODO: Add document preview
+        /// <summary>
+        /// Displays a preview of the file at the specified path in the picture box.
+        /// </summary>
+        /// <param name="path">The path of the file to display the preview for.</param>
+        private void DisplayPreview(string path)
+        {
+            // Clear the current image in the picture box
+            pictureBoxPreview.Image = null;
+
+            // Check if the file exists at the specified path
+            if (File.Exists(path))
+            {
+                // Check if the file is a video file based on its extension
+                if (IsVideoFile(Path.GetExtension(path)))
+                {
+                    // Generate a video thumbnail and display it in the picture box
+                    GenerateVideoThumbnail(path);
+                }
+                // Check if the file is an image file based on its extension
+                else if (IsImageFile(Path.GetExtension(path)))
+                {
+                    // Generate an image preview and display it in the picture box
+                    GenerateImagePreview(path);
+                }
+                else
+                {
+                    // The file is neither a video nor an image file, display a default "no preview" image
+                    pictureBoxPreview.Image = noPreviewImage;
+                }
+            }
+        }
+
+
+        /// <summary>
+        /// Generates an image preview from the specified image file and displays it in the picture box.
+        /// </summary>
+        /// <param name="imagePath">The path of the image file.</param>
+        private void GenerateImagePreview(string imagePath)
+        {
+            try
+            {
+                // Open the image file for reading using a FileStream
+                using (FileStream fs = new FileStream(imagePath, FileMode.Open, FileAccess.Read))
+                {
+                    // Create an Image object from the stream and assign it to the picture box
+                    pictureBoxPreview.Image = Image.FromStream(fs);
+
+                    // Check if the image width is greater than the PictureBox width
+                    if (pictureBoxPreview.Image.Width > pictureBoxPreview.Width)
+                    {
+                        // If the image is wider than the PictureBox, set the PictureBoxSizeMode to Zoom
+                        pictureBoxPreview.SizeMode = PictureBoxSizeMode.Zoom;
+                    }
+                    else
+                    {
+                        // If the image is smaller or equal to the PictureBox, set the PictureBoxSizeMode to CenterImage
+                        pictureBoxPreview.SizeMode = PictureBoxSizeMode.CenterImage;
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                // Ignore any errors that occur during image generation
+            }
+        }
+
+
+        /// <summary>
+        /// Generates a thumbnail image for the specified video file and displays it in the picture box.
+        /// </summary>
+        /// <param name="videoPath">The path of the video file.</param>
+        private void GenerateVideoThumbnail(string videoPath)
+        {
+            try
+            {
+                // Create a ShellFile instance from the video file path
+                ShellFile shellFile = ShellFile.FromFilePath(videoPath);
+
+                // Retrieve the thumbnail bitmap from the ShellFile
+                Bitmap thumbnail = shellFile.Thumbnail.Bitmap;
+
+                // Assign the thumbnail image to the picture box
+                pictureBoxPreview.Image = thumbnail;
+
+                // Check if the image width is greater than the PictureBox width
+                if (pictureBoxPreview.Image.Width > pictureBoxPreview.Width)
+                {
+                    // If the image is wider than the PictureBox, set the PictureBoxSizeMode to Zoom
+                    pictureBoxPreview.SizeMode = PictureBoxSizeMode.Zoom;
+                }
+                else
+                {
+                    // If the image is smaller or equal to the PictureBox, set the PictureBoxSizeMode to CenterImage
+                    pictureBoxPreview.SizeMode = PictureBoxSizeMode.CenterImage;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                // Display an error message if an exception occurs during thumbnail generation
+                MessageBox.Show("Error generating video thumbnail: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+
+        /// <summary>
+        /// Generates a default "No preview available" image with a specified width and height.
+        /// </summary>
+        /// <returns>A Bitmap object representing the generated image.</returns>
+        private Bitmap GenerateNoPreviewImage()
+        {
+            int width = pictureBoxPreview.Width;
+            int height = pictureBoxPreview.Height;
+
+            // Create a new Bitmap object with the specified width and height
+            Bitmap image = new Bitmap(width, height);
+
+            using (Graphics graphics = Graphics.FromImage(image))
+            {
+                // Set the graphics smoothing mode to AntiAlias for smoother rendering
+                graphics.SmoothingMode = SmoothingMode.AntiAlias;
+
+                // Clear the graphics with a white background
+                graphics.Clear(Color.White);
+
+                //If you want border on "no preview image", then you can use this
+                //using (Pen pen = new Pen(Color.Gray, 1))
+                //{
+                //     Draw a rectangle with a gray pen, leaving a 1-pixel border around the image
+                //    graphics.DrawRectangle(pen, 0, 0, width - 1, height - 1);
+                //}
+
+                using (Font font = new Font("Arial", 12))
+                {
+                    // Create a StringFormat object with center alignment for text rendering
+                    StringFormat format = new StringFormat
+                    {
+                        Alignment = StringAlignment.Center,
+                        LineAlignment = StringAlignment.Center
+                    };
+
+                    // Draw the "No preview available" text in the center of the image
+                    graphics.DrawString("No preview available", font, Brushes.Black, new RectangleF(0, 0, width, height), format);
+                }
+            }
+
+            // Return the generated image
+            return image;
         }
 
 
@@ -1344,6 +1539,8 @@ namespace LiteManager
         {
             // Adjust the width of the address bar by subtracting the constant value 313 from the form's width, It can be different in your case.
             addressBar.Width = Width - 313;
+            // Adjust the size of preview pane
+            panelForImagePreview.Width = Width - driveTreeView.Width - fileListView.Width;
         }
 
 
@@ -1404,7 +1601,7 @@ namespace LiteManager
 
 
         /// <summary>
-        /// Updates the selected items status label based on the number of selected items.
+        /// Updates the selectedItemsToolStripStatusLabel based on the number of selected items. and displays a preview of the first selected item, if applicable.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -1414,6 +1611,20 @@ namespace LiteManager
             selectedItemsToolStripStatusLabel.Text = fileListView.SelectedItems.Count == 0
                 ? "" // No items selected
                 : $"{fileListView.SelectedItems.Count} {(fileListView.SelectedItems.Count == 1 ? "item" : "items")}  selected   |"; // Display the count and pluralize "item" if necessary
+
+
+            // If at least one item is selected
+            if (fileListView.SelectedItems.Count > 0)
+            {
+                // Get the first selected item
+                ListViewItem selectedItem = fileListView.SelectedItems[0];
+
+                // Get the image path associated with the selected item from the Tag property
+                string filePath = ((Dictionary<string, string>)selectedItem.Tag)["FullName"];
+
+                // Display a preview of the selected item
+                DisplayPreview(filePath);
+            }
         }
 
 
@@ -1444,10 +1655,74 @@ namespace LiteManager
         }
 
 
+        /// <summary>
+        /// Adjusts the PictureBoxSizeMode based on the image width compared to the PictureBox width.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void PictureBoxPreview_SizeChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                if (pictureBoxPreview.Image != null)
+                {
+                    // Check if the image width is greater than the PictureBox width
+                    if (pictureBoxPreview.Image.Width > pictureBoxPreview.Width)
+                    {
+                        // If the image is wider than the PictureBox, set the PictureBoxSizeMode to Zoom
+                        pictureBoxPreview.SizeMode = PictureBoxSizeMode.Zoom;
+                    }
+                    else
+                    {
+                        // If the image is smaller or equal to the PictureBox, set the PictureBoxSizeMode to CenterImage
+                        pictureBoxPreview.SizeMode = PictureBoxSizeMode.CenterImage;
+                    }
+                }
+            }
+            catch { }
 
+        }
+
+
+        /// <summary>
+        /// Toggles the visibility of the panelForImagePreview control based on the checked state of the PreviewPaneToolStripMenuItem.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void PreviewPaneToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            // Check the checked state of the PreviewPaneToolStripMenuItem
+            if (previewPaneToolStripMenuItem.Checked)
+            {
+                // If the PreviewPaneToolStripMenuItem is checked, make the panelForImagePreview control visible
+                panelForImagePreview.Visible = true;
+            }
+            else
+            {
+                // If the PreviewPaneToolStripMenuItem is not checked, hide the panelForImagePreview control
+                panelForImagePreview.Visible = false;
+            }
+        }
+
+
+        /// <summary>
+        /// Displays the AboutForm as a dialog.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void AboutToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            // Create a new instance of the AboutForm
+            AboutForm aboutForm = new AboutForm();
+
+            // Display the AboutForm as a dialog
+            aboutForm.ShowDialog();
+        }
 
 
         #endregion
+
+
     }
 
 }

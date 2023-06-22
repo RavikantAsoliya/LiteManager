@@ -12,3 +12,7 @@ D:\Programming Resources\C Sharp\GitHub Projects\LiteManager\LiteManager\obj\Deb
 D:\Programming Resources\C Sharp\GitHub Projects\LiteManager\LiteManager\obj\Debug\Interop.Shell32.dll
 D:\Programming Resources\C Sharp\GitHub Projects\LiteManager\LiteManager\obj\Debug\LiteManager.csproj.ResolveComReference.cache
 D:\Programming Resources\C Sharp\GitHub Projects\LiteManager\LiteManager\obj\Debug\LiteManager.PropertiesForm.resources
+D:\Programming Resources\C Sharp\GitHub Projects\LiteManager\LiteManager\bin\Debug\Microsoft.WindowsAPICodePack.dll
+D:\Programming Resources\C Sharp\GitHub Projects\LiteManager\LiteManager\bin\Debug\Microsoft.WindowsAPICodePack.Shell.dll
+D:\Programming Resources\C Sharp\GitHub Projects\LiteManager\LiteManager\obj\Debug\LiteManager.AboutForm.resources
+D:\Programming Resources\C Sharp\GitHub Projects\LiteManager\LiteManager\obj\Debug\LiteManager.csproj.CopyComplete
