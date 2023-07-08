@@ -1292,6 +1292,8 @@ namespace LiteManager
             // Check if the currentDirectory is not empty
             if (!string.IsNullOrEmpty(currentDirectory))
             {
+                if (currentDirectory == "recent")
+                    return;
                 // Get the parent directory of the current directory
                 var parentDirectory = Directory.GetParent(currentDirectory);
 
