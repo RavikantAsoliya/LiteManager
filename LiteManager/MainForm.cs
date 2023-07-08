@@ -19,6 +19,7 @@ using LiteManager.Helper;
 using Microsoft.WindowsAPICodePack.Shell;
 using System.Drawing.Drawing2D;
 using LiteManager;
+using System.IO.Compression;
 
 namespace LiteManager
 {
@@ -858,6 +859,16 @@ namespace LiteManager
                         // Rename the file by moving it to the new name
                         File.Move(oldName, newName);
                         ((Dictionary<string, string>)fileListView.SelectedItems[0].Tag)["FullName"] = newName;
+                        if (!imageList.Images.ContainsKey(".txt"))
+                        {
+                            // Get file icon for other file types
+                            Icon fileIcon = IconProvider.GetIconByFileName(newName);
+
+                            // Add image to image list
+                            imageList.Images.Add(".txt", fileIcon);
+                        }
+                        fileListView.SelectedItems[0].ImageKey = Path.GetExtension(newName);
+
                     }
                 }
                 else if (Directory.Exists(oldName))
@@ -1030,6 +1041,18 @@ namespace LiteManager
                     {"FullName", newFilePath },
                     {"Type", "File" }
                 };
+
+                if (!imageList.Images.ContainsKey(".txt"))
+                {
+                    // Get file icon for other file types
+                    Icon fileIcon = IconProvider.GetIconByFileName(newFilePath);
+
+                    // Add image to image list
+                    imageList.Images.Add(".txt", fileIcon);
+                }
+
+                // Set image key for the item
+                item.ImageKey = ".txt";
 
                 item.Tag = dict;
 
@@ -1720,9 +1743,219 @@ namespace LiteManager
         }
 
 
+
         #endregion
 
+        //TODO: Some Other Features of Compression and Decompression will be added soon.
+        #region Compression and Decompression Functionality
 
+        /// <summary>
+        /// Generates a unique file path based on the base file path and the desired file extension.
+        /// If the compressed file is already present in the base file path, it appends a counter value to make it unique.
+        /// </summary>
+        /// <param name="baseFilePath">The base file path to generate a unique file path from.</param>
+        /// <param name="fileExtension">The desired file extension to be added to the file path.</param>
+        /// <returns>A unique file path with the desired file extension.</returns>
+        private string GetUniqueFilePath(string baseFilePath, string fileExtension)
+        {
+            // Ensure that the file extension starts with a dot, or add it if missing
+            fileExtension = fileExtension.StartsWith(".") ? fileExtension : "." + fileExtension;
+
+            // Construct the initial new file path based on the base file path and whether it exists
+            string newFilePath = Path.Combine(
+                Path.GetDirectoryName(baseFilePath), // Get the directory path of the base file
+                File.Exists(baseFilePath) // Check if the base file path represents an existing file
+                    ? ( // If it's a file, determine the new file name based on extension presence
+                        string.IsNullOrEmpty(Path.GetFileNameWithoutExtension(baseFilePath)) // Check if the file name (without extension) is empty or null
+                            ? Path.GetFileName(baseFilePath) // Use the base file name (with extension) as is
+                            : Path.GetFileNameWithoutExtension(baseFilePath) // Use the file name without extension
+                      )
+                    : Path.GetFileName(baseFilePath) // If it's not a file, use the base file name as is
+                ) + fileExtension; // Append the file extension to the new file path
+
+            // Initialize a counter for handling duplicate file names
+            int counter = 1;
+
+            // Check if the new file path already exists, and if so, modify it to ensure uniqueness
+            while (File.Exists(newFilePath))
+            {
+                newFilePath = Path.Combine(
+                    Path.GetDirectoryName(newFilePath), // Get the directory path of the new file path
+                    $"{Path.GetFileNameWithoutExtension(newFilePath)}({counter++}){fileExtension}" // Append the counter and file extension to create a unique file name
+                );
+            }
+
+            // Return the final unique file path
+            return newFilePath;
+        }
+
+
+        /// <summary>
+        /// Compresses the specified files and folders into a zip archive.
+        /// </summary>
+        /// <param name="filesAndFolders">The list of file and folder paths to be compressed.</param>
+        /// <param name="zipPath">The path of the zip archive to create.</param>
+        public void CompressFilesAndFolders(List<string> filesAndFolders, string zipPath)
+        {
+            // Open a zip archive for writing
+            using (ZipArchive zip = ZipFile.Open(zipPath, ZipArchiveMode.Create))
+            {
+                // Iterate through each item in the list of files and folders
+                foreach (string itemPath in filesAndFolders)
+                {
+                    // Check if the item is a file
+                    if (File.Exists(itemPath))
+                    {
+                        // Get the file name
+                        string entryName = Path.GetFileName(itemPath);
+                        // Create a zip entry from the file and add it to the archive
+                        zip.CreateEntryFromFile(itemPath, entryName, CompressionLevel.Optimal);
+                    }
+                    // Check if the item is a directory
+                    else if (Directory.Exists(itemPath))
+                    {
+                        // Get the directory name
+                        string folderName = new DirectoryInfo(itemPath).Name;
+                        // Get all files within the directory and its subdirectories
+                        string[] files = Directory.GetFiles(itemPath, "*", SearchOption.AllDirectories);
+
+                        // Iterate through each file
+                        foreach (string file in files)
+                        {
+                            // Get the relative path of the file from the directory
+                            string entryName = GetRelativePath(itemPath, file);
+                            // Create a zip entry from the file with its relative path and add it to the archive
+                            zip.CreateEntryFromFile(file, Path.Combine(folderName, entryName), CompressionLevel.Optimal);
+                        }
+                    }
+                }
+            }
+        }
+
+
+        /// <summary>
+        /// Gets the relative path from a base directory to a full path.
+        /// </summary>
+        /// <param name="baseDirectory">The base directory path.</param>
+        /// <param name="fullPath">The full path to convert to a relative path.</param>
+        /// <returns>The relative path from the base directory to the full path.</returns>
+        private static string GetRelativePath(string baseDirectory, string fullPath)
+        {
+            // Create a Uri for the base directory with a trailing directory separator character
+            Uri baseUri = new Uri(baseDirectory.EndsWith(Path.DirectorySeparatorChar.ToString())
+                ? baseDirectory
+                : baseDirectory + Path.DirectorySeparatorChar);
+
+            // Create a Uri for the full path
+            Uri fullUri = new Uri(fullPath);
+
+            // Get the relative Uri from the base Uri to the full Uri
+            Uri relativeUri = baseUri.MakeRelativeUri(fullUri);
+
+            // Convert the relative Uri to a string and unescape any encoded characters
+            string relativePath = Uri.UnescapeDataString(relativeUri.ToString());
+
+            // Replace forward slashes with the platform-specific directory separator character
+            relativePath = relativePath.Replace('/', Path.DirectorySeparatorChar);
+
+            // Return the resulting relative path
+            return relativePath;
+        }
+
+
+        //TODO: Add overwrite or skip
+        /// <summary>
+        /// Decompresses a zip file to the specified extract path.
+        /// </summary>
+        /// <param name="zipPath">The path of the zip file to decompress.</param>
+        /// <param name="extractPath">The path where the zip file contents will be extracted.</param>
+        public void DecompressFile(string zipPath, string extractPath)
+        {
+            try
+            {
+                // Open the zip file for reading
+                using (var archive = ZipFile.OpenRead(zipPath))
+                {
+                    // Iterate over each entry in the zip file
+                    foreach (var entry in archive.Entries)
+                    {
+                        try
+                        {
+                            // Combine the extract path with the entry's full name to get the entry's extract path
+                            string entryPath = Path.Combine(extractPath, entry.FullName);
+
+                            // Create the necessary directory structure for the entry if it doesn't exist
+                            Directory.CreateDirectory(Path.GetDirectoryName(entryPath));
+
+                            // Extract the entry to the specified extract path, overwriting existing files
+                            entry.ExtractToFile(entryPath, overwrite: true);
+                        }
+                        catch (Exception ex)
+                        {
+                            // Handle the exception for a specific entry
+                            Console.WriteLine($"Error extracting entry '{entry.FullName}': {ex.Message}");
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Handle the exception for opening the zip file
+                //MessageBox.Show($"Error opening zip file '{zipPath}': {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+
+        /// <summary>
+        /// Adds the selected files nad folders into a new zip file.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void AddToZipFileToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            // Check if there are selected items in the file list view
+            if (fileListView.SelectedItems.Count > 0)
+            {
+                // Clear the clipboard path list
+                clipboardPathList.Clear();
+
+                // Iterate over each selected item in the file list view
+                foreach (ListViewItem item in fileListView.SelectedItems)
+                {
+                    // Add the full name of the item to the clipboard path list
+                    clipboardPathList.Add(((Dictionary<string, string>)item.Tag)["FullName"]);
+                }
+
+                // Get a unique file path for the zip file based on the full name of the focused item
+                string zipPath = GetUniqueFilePath(((Dictionary<string, string>)fileListView.FocusedItem.Tag)["FullName"], ".zip");
+
+                // Output the zip file path to the console (for testing/debugging purposes)
+                Console.WriteLine(zipPath);
+
+                // Compress the selected items to the zip file
+                CompressFilesAndFolders(clipboardPathList, zipPath);
+            }
+        }
+
+
+        /// <summary>
+        /// Decompresses the selected zip file.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void DecompressToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            // Get the full path of the selected zip file from the tag of the selected item in the file list view
+            string zipPath = ((Dictionary<string, string>)fileListView.SelectedItems[0].Tag)["FullName"];
+
+            // Get the path for extracting the decompressed files/folders
+            string path = Path.Combine(Path.GetDirectoryName(zipPath), Path.GetFileNameWithoutExtension(zipPath));
+
+            // Call the DecompressFile method to decompress the zip file to the specified path
+            DecompressFile(zipPath, path);
+        }
+
+        #endregion
     }
 
 }
