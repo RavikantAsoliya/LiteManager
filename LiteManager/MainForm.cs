@@ -814,7 +814,7 @@ namespace LiteManager
             if (fileListView.SelectedItems.Count > 0)
             {
                 // Get the first selected item from the fileListView
-                ListViewItem selectedItem = fileListView.SelectedItems[0];
+                ListViewItem selectedItem = fileListView.FocusedItem;
 
                 // Begin the edit mode for the selected item, allowing the user to modify its text
                 selectedItem.BeginEdit();
