@@ -1112,12 +1112,12 @@ namespace LiteManager
         {
             if (fileListView.SelectedItems.Count > 0)
             {
-                clipboardPathList.Clear();
+                List<string> ListOfFilesAndFolders = new List<string>();
                 foreach (ListViewItem item in fileListView.SelectedItems)
                 {
-                    clipboardPathList.Add(((Dictionary<string, string>)item.Tag)["FullName"]);
+                    ListOfFilesAndFolders.Add(((Dictionary<string, string>)item.Tag)["FullName"]);
                 }
-                PropertiesForm propertiesForm = new PropertiesForm(clipboardPathList);
+                PropertiesForm propertiesForm = new PropertiesForm(ListOfFilesAndFolders);
                 propertiesForm.ShowDialog();
             }
         }
@@ -1919,13 +1919,13 @@ namespace LiteManager
             if (fileListView.SelectedItems.Count > 0)
             {
                 // Clear the clipboard path list
-                clipboardPathList.Clear();
+                List<string> ListOfFilesAndFolders = new List<string>();
 
                 // Iterate over each selected item in the file list view
                 foreach (ListViewItem item in fileListView.SelectedItems)
                 {
                     // Add the full name of the item to the clipboard path list
-                    clipboardPathList.Add(((Dictionary<string, string>)item.Tag)["FullName"]);
+                    ListOfFilesAndFolders.Add(((Dictionary<string, string>)item.Tag)["FullName"]);
                 }
 
                 // Get a unique file path for the zip file based on the full name of the focused item
@@ -1935,7 +1935,7 @@ namespace LiteManager
                 Console.WriteLine(zipPath);
 
                 // Compress the selected items to the zip file
-                CompressFilesAndFolders(clipboardPathList, zipPath);
+                CompressFilesAndFolders(ListOfFilesAndFolders, zipPath);
             }
         }
 
