@@ -1421,12 +1421,79 @@ namespace LiteManager
         /// <param name="e"></param>
         private void ContextMenuStrip_Opening(object sender, CancelEventArgs e)
         {
-            if (fileListView.SelectedItems.Count == 0)
+            // Hide all menu items initially
+            foreach (ToolStripItem item in contextMenuStrip.Items)
             {
-                e.Cancel = false;
+                item.Visible = false;
             }
 
+            if (fileListView.SelectedItems.Count == 0)
+            {
+                // No items selected
+                viewToolStripMenuItem1.Visible = true;
+                refreshToolStripMenuItem.Visible = true;
+                pasteToolStripMenuItem.Visible = true;
+                selectAllToolStripMenuItem.Visible = true;
+                deselectAllToolStripMenuItem.Visible = true;
+                newToolStripMenuItem.Visible = true;
+                propertiesToolStripMenuItem.Visible = true;
+            }
+            else
+            {
+                // At least one item selected
+                bool isDirectory = Directory.Exists(((Dictionary<string, string>)fileListView.SelectedItems[0].Tag)["FullName"]);
+                bool isZipFile = (new FileInfo(((Dictionary<string, string>)fileListView.SelectedItems[0].Tag)["FullName"]).Extension == ".zip");
+                bool areMultipleItemsSelected = (fileListView.SelectedItems.Count > 1);
+
+                // Common options for a single selected item
+                openToolStripMenuItem.Visible = true;
+                cutToolStripMenuItem.Visible = true;
+                copyToolStripMenuItem.Visible = true;
+                deleteToolStripMenuItem.Visible = true;
+                renameToolStripMenuItem.Visible = true;
+                propertiesToolStripMenuItem.Visible = true;
+                compressionToolStripMenuItem.Visible = true;
+                decompressToolStripMenuItem.Visible = false;
+
+                if (isDirectory)
+                {
+                    // Selected item is a directory, show compression option
+                    compressionToolStripMenuItem.Visible = true;
+                }
+                else
+                {
+                    if (isZipFile)
+                    {
+                        // Selected item is a zip file, show decompression option
+                        decompressToolStripMenuItem.Visible = true;
+                    }
+                }
+
+                if (areMultipleItemsSelected)
+                {
+                    // Multiple items selected
+                    List<string> ListOfFilesAndFolders = new List<string>();
+                    foreach (ListViewItem item in fileListView.SelectedItems)
+                    {
+                        ListOfFilesAndFolders.Add(((Dictionary<string, string>)item.Tag)["FullName"]);
+                    }
+                    bool isAllOfTypeFileFolder = (FileTypeChecker.GetFileType(ListOfFilesAndFolders) == "All of Type File folder");
+                    bool isMultipleTypesWithAllExistingFiles = (FileTypeChecker.GetFileType(ListOfFilesAndFolders) == "Multiple Types" && ListOfFilesAndFolders.All(File.Exists));
+
+                    if (isAllOfTypeFileFolder)
+                    {
+                        // Multiple items of type File/Folder, show batch rename option
+                        batchRenameToolStripMenuItem.Visible = true;
+                    }
+                    else if (isMultipleTypesWithAllExistingFiles)
+                    {
+                        // Multiple items of multiple types with all existing files, show batch rename option
+                        batchRenameToolStripMenuItem.Visible = true;
+                    }
+                }
+            }
         }
+
 
         //TODO: If current directory is "recent" then drag nad drop should be disabled
         /// <summary>
