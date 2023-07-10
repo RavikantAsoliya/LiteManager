@@ -1,6 +1,6 @@
 # LiteManager
 
-LiteManager is a simple file management application built using C# and Windows Forms. It allows users to navigate and manage files and directories on their computer.
+LiteManager is a simple lightweight file management application built with C# and Windows Forms. It allows users to navigate, organize, and search for files and directories on their computer. With intuitive features like copy, paste, rename, delete, etc., as well as support for zip compression and decompression, LiteManager simplifies common file management tasks, making it easier to manage your files efficiently.
 
 ## Features
 
@@ -13,6 +13,9 @@ LiteManager is a simple file management application built using C# and Windows F
 - **Select and Deselect Files and Folders:** Conveniently select or deselect multiple files and folders for bulk operations.
 - **View Properties:** Quickly view detailed properties of files and folders, such as size, creation date, and file type.
 - **Navigation History Tracking:** LiteManager keeps track of your navigation history, allowing you to easily navigate back to previously visited directories. The application provides navigation buttons or keyboard shortcuts to go back and forth through your navigation history.
+- **Search:** Search for files and folders based on name.
+- **Zip Compression:** Compress files and folders into a zip file.
+- **Zip Decompression:** Decompress a zip file to extract its contents.
 
 ## Installation
 
@@ -43,7 +46,15 @@ To use the LiteManager application, follow these steps:
     - **View Properties**: Right-click on a file or folder and choose the "Properties" option to view detailed information.
 6. Double-click on a file or directory in the list view to open or navigate to it.
 7. Use the back and forward buttons or the address bar to navigate through the directory history.
-8. Right-click on a file or directory in the list view to access the context menu with additional options.
+8. To search for a file or folder, enter the search query in the search box located in the toolbar and press Enter. The search results will be displayed in the list view, showing the files and folders that match the search query.
+9. To compress files and folders into a zip file:
+   - Select the files and folders you want to compress.
+   - Right-click and choose the **Add to zip file** option or use the toolbar button.
+10. To decompress a zip file:
+   - Navigate to the directory where the zip file is located.
+   - Right-click on the zip file in the list view and click on **Decompress**.
+   - The extracted contents of the zip file will be displayed  in the list view by clicking the **Refresh** button.
+11. Right-click on a file or directory in the list view to access the context menu with additional options.
 
 ## Contributing
 
