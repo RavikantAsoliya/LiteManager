@@ -58,7 +58,15 @@ To use the LiteManager application, follow these steps:
 
 ## Contributing
 
-Contributions to the LiteManager application are welcome! If you find any issues or have suggestions for improvement, please create a new issue or submit a pull request.
+Contributions to the LiteManager application are welcome! If you find any issues or have suggestions for improvement, please create a new issue or submit a pull request. 
+
+Additionally, there are some TODO comments in the codebase that can be implemented to enhance the application's functionality. These TODOs indicate areas where additional features, improvements, or optimizations can be made. They serve as suggestions for future development and offer opportunities for contributors to contribute their ideas and expertise.
+
+Feel free to explore the codebase and locate the TODO comments. These comments are meant to highlight areas where further work is needed or where additional functionality can be added. You can implement these TODOs based on your requirements, preferences, and skill set. They provide a starting point for further enhancements to the LiteManager application.
+
+To find the TODO comments in the code, you can use the search functionality of your code editor or IDE and search for the keyword "TODO". Once you locate a TODO comment, you can review the associated code and make the necessary changes or additions to fulfill the intended functionality.
+
+By implementing the TODOs, you not only improve the LiteManager application but also contribute to the open-source community by sharing your enhancements with others. Your contributions are valuable and can help make LiteManager even better.
 
 ## License
 
