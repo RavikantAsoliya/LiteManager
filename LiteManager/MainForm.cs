@@ -1110,13 +1110,19 @@ namespace LiteManager
         /// <param name="e"></param>
         private void PropertiesToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            // Check if any item is selected in the file list view
             if (fileListView.SelectedItems.Count > 0)
             {
+                // Create a list to store the paths of selected files and folders
                 List<string> ListOfFilesAndFolders = new List<string>();
+
+                // Collect the selected files and folders
                 foreach (ListViewItem item in fileListView.SelectedItems)
                 {
                     ListOfFilesAndFolders.Add(((Dictionary<string, string>)item.Tag)["FullName"]);
                 }
+
+                // Open the properties form and pass the list of files and folders
                 PropertiesForm propertiesForm = new PropertiesForm(ListOfFilesAndFolders);
                 propertiesForm.ShowDialog();
             }
@@ -1362,35 +1368,50 @@ namespace LiteManager
                 // Call function to rename selected items
                 RenameToolStripMenuItem_Click(sender, e);
             }
+            // Check if the Back key is pressed
             else if (e.KeyCode == Keys.Back)
             {
+                // Call function for the Back button action
                 BackButton_Click(sender, e);
             }
+            // Check if the Ctrl + A key combination is pressed
             else if (e.KeyCode == Keys.A && e.Control)
             {
+                // Call function for selecting all items
                 SelectAllToolStripMenuItem_Click(sender, e);
             }
+            // Check if the Ctrl + C key combination is pressed
             else if (e.KeyCode == Keys.C && e.Control)
             {
+                // Call function for copying selected items
                 CopyToolStripMenuItem_Click(sender, e);
             }
+            // Check if the Ctrl + X key combination is pressed
             else if (e.KeyCode == Keys.X && e.Control)
             {
+                // Call function for cutting selected items
                 CutToolStripMenuItem_Click(sender, e);
             }
+            // Check if the Ctrl + V key combination is pressed
             else if (e.KeyCode == Keys.V && e.Control)
             {
+                // Call function for pasting items
                 PasteToolStripMenuItem_Click(sender, e);
             }
+            // Check if the Enter key is pressed
             else if (e.KeyCode == Keys.Enter)
             {
+                // Call function for opening selected items
                 OpenToolStripMenuItem_Click(sender, e);
             }
+            // Check if the Ctrl + Shift + N key combination is pressed
             else if (e.Control && e.Shift && e.KeyCode == Keys.N)
             {
+                // Call function for creating a new folder
                 NewFolderToolStripMenuItem_Click(sender, e);
             }
         }
+
 
 
         // TODO: Add Some more click and enhance functionality
@@ -1644,6 +1665,7 @@ namespace LiteManager
         /// <param name="e"></param>
         private void ItemCheckBoxesToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            // Set the CheckBoxes property of the fileListView based on the checked state of itemCheckBoxesToolStripMenuItem
             fileListView.CheckBoxes = itemCheckBoxesToolStripMenuItem.Checked;
         }
 
@@ -1813,12 +1835,12 @@ namespace LiteManager
         }
 
 
-
         #endregion
 
 
         //TODO: Some Other Features of Compression and Decompression will be added soon.
         #region Compression and Decompression Functionality
+
 
         /// <summary>
         /// Generates a unique file path based on the base file path and the desired file extension.
@@ -2026,111 +2048,171 @@ namespace LiteManager
             DecompressFile(zipPath, path);
         }
 
+
         #endregion
 
 
         #region Search Functionality
-        
+
+
+        /// <summary>
+        /// Initiates the search operation in the specified directory for the given search query.
+        /// </summary>
+        /// <param name="directoryPath">The path of the directory to search.</param>
+        /// <param name="searchQuery">The search query to match against file and folder names.</param>
         private void Search(string directoryPath, string searchQuery)
         {
+            // Clear the fileListView by invoking it on the UI thread
             fileListView.BeginInvoke(new Action(() =>
             {
                 fileListView.Items.Clear();
             }));
-            
+
+            // Run the search operation on a separate task
             Task.Run(() =>
             {
                 try
                 {
+                    // Call the SearchDirectory method to perform the actual search
                     SearchDirectory(directoryPath, searchQuery);
                 }
                 catch (Exception ex)
                 {
+                    // Handle the exception for any errors occurred during the search
                     Console.WriteLine("An error occurred during the search: " + ex.Message);
                 }
             });
         }
 
+
+        /// <summary>
+        /// Recursively searches the specified directory for files and folders matching the given search query.
+        /// </summary>
+        /// <param name="directoryPath">The path of the directory to search.</param>
+        /// <param name="searchQuery">The search query to match against file and folder names.</param>
         private void SearchDirectory(string directoryPath, string searchQuery)
         {
             try
             {
+                // Get the directory information
                 var directory = new DirectoryInfo(directoryPath);
+
+                // Enumerate files in the directory
                 var files = directory.EnumerateFiles("*", SearchOption.TopDirectoryOnly);
+
+                // Enumerate subdirectories in the directory
                 var folders = directory.EnumerateDirectories("*", SearchOption.TopDirectoryOnly);
 
+                // Iterate over each file in the directory
                 foreach (var file in files)
                 {
                     try
                     {
+                        // Check if the file name contains the search query
                         if (file.Name.Contains(searchQuery))
                         {
+                            // Add the file to the ListView
                             AddItemToListView(file.FullName, true);
                         }
                     }
                     catch (Exception ex)
                     {
+                        // Handle the exception for the file processing
                         Console.WriteLine($"An error occurred while processing file '{file.FullName}': {ex.Message}");
                     }
                 }
 
+                // Parallel iteration over each subdirectory in the directory
                 Parallel.ForEach(folders, folder =>
                 {
                     try
                     {
+                        // Check if the folder name contains the search query
                         if (folder.Name.Contains(searchQuery))
                         {
+                            // Add the folder to the ListView
                             AddItemToListView(folder.FullName, false);
                         }
+
+                        // Recursive call to search the subdirectory
                         SearchDirectory(folder.FullName, searchQuery);
                     }
                     catch (Exception ex)
                     {
+                        // Handle the exception for the folder processing
                         Console.WriteLine($"An error occurred while processing folder '{folder.FullName}': {ex.Message}");
                     }
                 });
             }
             catch (Exception ex)
             {
+                // Handle the exception for the directory search
                 Console.WriteLine($"An error occurred while searching directory '{directoryPath}': {ex.Message}");
             }
         }
 
+
+        /// <summary>
+        /// Initiates a search operation when the Enter key is pressed.
+        /// </summary>
+        /// <param name="sender">The sender object.</param>
+        /// <param name="e">The KeyEventArgs.</param>
         private void SearchToolStripComboBox_KeyDown(object sender, KeyEventArgs e)
         {
+            // Get the search query from the searchToolStripComboBox
             string searchQuery = searchToolStripComboBox.Text;
+
+            // Get the current directory path
             string directoryPath = currentDirectory;
+
+            // Check if the Enter key is pressed
             if (e.KeyCode == Keys.Enter)
             {
+                // Check if the search query is not empty or null
                 if (!string.IsNullOrEmpty(searchQuery))
                 {
+                    // Perform the search operation on a separate thread
                     Task.Run(() =>
                     {
                         Search(directoryPath, searchQuery);
                     });
-                    
                 }
             }
         }
 
+
+        /// <summary>
+        /// Adds an item to the fileListView control based on the given file or directory path.
+        /// </summary>
+        /// <param name="fullPath">The full path of the file or directory.</param>
+        /// <param name="isFile">Indicates whether the item is a file or a directory.</param>
         private void AddItemToListView(string fullPath, bool isFile)
         {
+            // Run the following code on a separate thread
             Task.Run(() =>
             {
+                // If the item is a file
                 if (isFile)
                 {
+                    // Execute this code on the UI thread
                     fileListView.Invoke(new Action(() =>
                     {
+                        // Get the file information
                         FileInfo fileInfo = new FileInfo(fullPath);
+
+                        // Create a new ListViewItem and add it to the fileListView
                         ListViewItem item = fileListView.Items.Add(fileInfo.Name);
+
                         if (fileInfo.Extension == ".exe" || fileInfo.Extension == "")
                         {
+                            // If the file is an executable or its extension is empty, use a custom icon
                             Icon fileIcon = IconProvider.GetIconByFileName(fileInfo.FullName);
                             imageList.Images.Add(fileInfo.Name, fileIcon);
                             item.ImageKey = fileInfo.Name;
                         }
                         else
                         {
+                            // If the file has an extension, use the corresponding icon
                             if (!imageList.Images.ContainsKey(fileInfo.Extension))
                             {
                                 Icon fileIcon = IconProvider.GetIconByFileName(fileInfo.FullName);
@@ -2138,37 +2220,54 @@ namespace LiteManager
                             }
                             item.ImageKey = fileInfo.Extension;
                         }
+
+                        // Store the file's full name and type in the item's tag
                         item.Tag = new Dictionary<string, string>
                         {
                             {"FullName", fileInfo.FullName},
                             {"Type", "File" }
                         };
+
+                        // Add sub-items for file type, size, and last write time
                         item.SubItems.Add(FileTypeChecker.GetFileTypeByExtension(fileInfo.Extension));
                         item.SubItems.Add(SizeManager.FormatSize(fileInfo.Length));
                         item.SubItems.Add(fileInfo.LastWriteTime.ToString());
+
+                        // Update the countToolStripStatusLabel with the new item count
                         countToolStripStatusLabel.Text = $"{fileListView.Items.Count} items";
                     }));
                 }
-                else
+                else // If the item is a folder
                 {
+                    // Execute this code on the UI thread
                     fileListView.Invoke(new Action(() =>
                     {
+                        // Get the directory information
                         DirectoryInfo dirInfo = new DirectoryInfo(fullPath);
+
+                        // Create a new ListViewItem for the directory and add it to the fileListView
                         ListViewItem item = fileListView.Items.Add(dirInfo.Name, (int)IconIndex.Folder);
+
+                        // Store the directory's full name and type in the item's tag
                         item.Tag = new Dictionary<string, string>
                         {
                             {"FullName", dirInfo.FullName},
                             {"Type", "Folder" }
                         };
+
+                        // Add sub-items for folder type and last write time
                         item.SubItems.Add("Folder");
                         item.SubItems.Add("");
                         item.SubItems.Add(dirInfo.LastWriteTime.ToString());
+
+                        // Update the countToolStripStatusLabel with the new item count
                         countToolStripStatusLabel.Text = $"{fileListView.Items.Count} items";
                     }));
                 }
             });
         }
-        
+
+
         #endregion
     }
 
