@@ -1136,6 +1136,7 @@ namespace LiteManager
             // Check if the selected node's tag represents recent directory
             if (e.Node.Tag.ToString() == "recent")
             {
+                addressBar.Text = "recent";
                 PopulateListView("recent");
             }
             // Check if the selected node's tag represents a DirectoryInfo object
@@ -1815,6 +1816,7 @@ namespace LiteManager
 
         #endregion
 
+
         //TODO: Some Other Features of Compression and Decompression will be added soon.
         #region Compression and Decompression Functionality
 
@@ -2024,6 +2026,149 @@ namespace LiteManager
             DecompressFile(zipPath, path);
         }
 
+        #endregion
+
+
+        #region Search Functionality
+        
+        private void Search(string directoryPath, string searchQuery)
+        {
+            fileListView.BeginInvoke(new Action(() =>
+            {
+                fileListView.Items.Clear();
+            }));
+            
+            Task.Run(() =>
+            {
+                try
+                {
+                    SearchDirectory(directoryPath, searchQuery);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("An error occurred during the search: " + ex.Message);
+                }
+            });
+        }
+
+        private void SearchDirectory(string directoryPath, string searchQuery)
+        {
+            try
+            {
+                var directory = new DirectoryInfo(directoryPath);
+                var files = directory.EnumerateFiles("*", SearchOption.TopDirectoryOnly);
+                var folders = directory.EnumerateDirectories("*", SearchOption.TopDirectoryOnly);
+
+                foreach (var file in files)
+                {
+                    try
+                    {
+                        if (file.Name.Contains(searchQuery))
+                        {
+                            AddItemToListView(file.FullName, true);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"An error occurred while processing file '{file.FullName}': {ex.Message}");
+                    }
+                }
+
+                Parallel.ForEach(folders, folder =>
+                {
+                    try
+                    {
+                        if (folder.Name.Contains(searchQuery))
+                        {
+                            AddItemToListView(folder.FullName, false);
+                        }
+                        SearchDirectory(folder.FullName, searchQuery);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"An error occurred while processing folder '{folder.FullName}': {ex.Message}");
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred while searching directory '{directoryPath}': {ex.Message}");
+            }
+        }
+
+        private void SearchToolStripComboBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            string searchQuery = searchToolStripComboBox.Text;
+            string directoryPath = currentDirectory;
+            if (e.KeyCode == Keys.Enter)
+            {
+                if (!string.IsNullOrEmpty(searchQuery))
+                {
+                    Task.Run(() =>
+                    {
+                        Search(directoryPath, searchQuery);
+                    });
+                    
+                }
+            }
+        }
+
+        private void AddItemToListView(string fullPath, bool isFile)
+        {
+            Task.Run(() =>
+            {
+                if (isFile)
+                {
+                    fileListView.Invoke(new Action(() =>
+                    {
+                        FileInfo fileInfo = new FileInfo(fullPath);
+                        ListViewItem item = fileListView.Items.Add(fileInfo.Name);
+                        if (fileInfo.Extension == ".exe" || fileInfo.Extension == "")
+                        {
+                            Icon fileIcon = IconProvider.GetIconByFileName(fileInfo.FullName);
+                            imageList.Images.Add(fileInfo.Name, fileIcon);
+                            item.ImageKey = fileInfo.Name;
+                        }
+                        else
+                        {
+                            if (!imageList.Images.ContainsKey(fileInfo.Extension))
+                            {
+                                Icon fileIcon = IconProvider.GetIconByFileName(fileInfo.FullName);
+                                imageList.Images.Add(fileInfo.Extension, fileIcon);
+                            }
+                            item.ImageKey = fileInfo.Extension;
+                        }
+                        item.Tag = new Dictionary<string, string>
+                        {
+                            {"FullName", fileInfo.FullName},
+                            {"Type", "File" }
+                        };
+                        item.SubItems.Add(FileTypeChecker.GetFileTypeByExtension(fileInfo.Extension));
+                        item.SubItems.Add(SizeManager.FormatSize(fileInfo.Length));
+                        item.SubItems.Add(fileInfo.LastWriteTime.ToString());
+                        countToolStripStatusLabel.Text = $"{fileListView.Items.Count} items";
+                    }));
+                }
+                else
+                {
+                    fileListView.Invoke(new Action(() =>
+                    {
+                        DirectoryInfo dirInfo = new DirectoryInfo(fullPath);
+                        ListViewItem item = fileListView.Items.Add(dirInfo.Name, (int)IconIndex.Folder);
+                        item.Tag = new Dictionary<string, string>
+                        {
+                            {"FullName", dirInfo.FullName},
+                            {"Type", "Folder" }
+                        };
+                        item.SubItems.Add("Folder");
+                        item.SubItems.Add("");
+                        item.SubItems.Add(dirInfo.LastWriteTime.ToString());
+                        countToolStripStatusLabel.Text = $"{fileListView.Items.Count} items";
+                    }));
+                }
+            });
+        }
+        
         #endregion
     }
 

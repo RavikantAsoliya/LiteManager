@@ -53,6 +53,9 @@ namespace LiteManager
             this.compressionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.addToZipFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.decompressToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.newToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.newFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.newFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -85,9 +88,6 @@ namespace LiteManager
             this.panelForImagePreview = new System.Windows.Forms.Panel();
             this.pictureBoxPreview = new System.Windows.Forms.PictureBox();
             this.splitter2 = new System.Windows.Forms.Splitter();
-            this.newToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.newFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.newFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStrip.SuspendLayout();
             this.menuStrip.SuspendLayout();
             this.statusBar.SuspendLayout();
@@ -104,11 +104,11 @@ namespace LiteManager
             this.driveTreeView.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.driveTreeView.ImageIndex = 0;
             this.driveTreeView.ImageList = this.imageList;
-            this.driveTreeView.Location = new System.Drawing.Point(0, 49);
+            this.driveTreeView.Location = new System.Drawing.Point(0, 51);
             this.driveTreeView.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.driveTreeView.Name = "driveTreeView";
             this.driveTreeView.SelectedImageIndex = 0;
-            this.driveTreeView.Size = new System.Drawing.Size(233, 390);
+            this.driveTreeView.Size = new System.Drawing.Size(233, 388);
             this.driveTreeView.TabIndex = 0;
             this.driveTreeView.BeforeExpand += new System.Windows.Forms.TreeViewCancelEventHandler(this.DriveTreeView_BeforeExpand);
             this.driveTreeView.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.DriveTreeView_AfterSelect);
@@ -142,7 +142,7 @@ namespace LiteManager
             this.compressionToolStripMenuItem,
             this.newToolStripMenuItem});
             this.contextMenuStrip.Name = "contextMenuStrip";
-            this.contextMenuStrip.Size = new System.Drawing.Size(181, 340);
+            this.contextMenuStrip.Size = new System.Drawing.Size(151, 318);
             this.contextMenuStrip.Opening += new System.ComponentModel.CancelEventHandler(this.ContextMenuStrip_Opening);
             // 
             // openToolStripMenuItem
@@ -301,16 +301,39 @@ namespace LiteManager
             // addToZipFileToolStripMenuItem
             // 
             this.addToZipFileToolStripMenuItem.Name = "addToZipFileToolStripMenuItem";
-            this.addToZipFileToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.addToZipFileToolStripMenuItem.Size = new System.Drawing.Size(145, 22);
             this.addToZipFileToolStripMenuItem.Text = "Add toZipFile";
             this.addToZipFileToolStripMenuItem.Click += new System.EventHandler(this.AddToZipFileToolStripMenuItem_Click);
             // 
             // decompressToolStripMenuItem
             // 
             this.decompressToolStripMenuItem.Name = "decompressToolStripMenuItem";
-            this.decompressToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.decompressToolStripMenuItem.Size = new System.Drawing.Size(145, 22);
             this.decompressToolStripMenuItem.Text = "Decompress";
             this.decompressToolStripMenuItem.Click += new System.EventHandler(this.DecompressToolStripMenuItem_Click);
+            // 
+            // newToolStripMenuItem
+            // 
+            this.newToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.newFolderToolStripMenuItem,
+            this.newFileToolStripMenuItem});
+            this.newToolStripMenuItem.Name = "newToolStripMenuItem";
+            this.newToolStripMenuItem.Size = new System.Drawing.Size(150, 22);
+            this.newToolStripMenuItem.Text = "New";
+            // 
+            // newFolderToolStripMenuItem
+            // 
+            this.newFolderToolStripMenuItem.Name = "newFolderToolStripMenuItem";
+            this.newFolderToolStripMenuItem.Size = new System.Drawing.Size(134, 22);
+            this.newFolderToolStripMenuItem.Text = "New Folder";
+            this.newFolderToolStripMenuItem.Click += new System.EventHandler(this.NewFolderToolStripMenuItem_Click);
+            // 
+            // newFileToolStripMenuItem
+            // 
+            this.newFileToolStripMenuItem.Name = "newFileToolStripMenuItem";
+            this.newFileToolStripMenuItem.Size = new System.Drawing.Size(134, 22);
+            this.newFileToolStripMenuItem.Text = "New File";
+            this.newFileToolStripMenuItem.Click += new System.EventHandler(this.NewFileToolStripMenuItem_Click);
             // 
             // menuStrip
             // 
@@ -450,7 +473,7 @@ namespace LiteManager
             this.searchToolStripComboBox});
             this.topToolStrip.Location = new System.Drawing.Point(0, 24);
             this.topToolStrip.Name = "topToolStrip";
-            this.topToolStrip.Size = new System.Drawing.Size(984, 25);
+            this.topToolStrip.Size = new System.Drawing.Size(984, 27);
             this.topToolStrip.TabIndex = 4;
             this.topToolStrip.Text = "toolStrip1";
             // 
@@ -461,7 +484,7 @@ namespace LiteManager
             this.backButton.Image = global::LiteManager.Properties.Resources.back;
             this.backButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.backButton.Name = "backButton";
-            this.backButton.Size = new System.Drawing.Size(23, 22);
+            this.backButton.Size = new System.Drawing.Size(23, 24);
             this.backButton.Text = "toolStripButton1";
             this.backButton.Click += new System.EventHandler(this.BackButton_Click);
             // 
@@ -473,7 +496,7 @@ namespace LiteManager
             this.forwardButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.forwardButton.Margin = new System.Windows.Forms.Padding(5, 1, 0, 2);
             this.forwardButton.Name = "forwardButton";
-            this.forwardButton.Size = new System.Drawing.Size(23, 22);
+            this.forwardButton.Size = new System.Drawing.Size(23, 24);
             this.forwardButton.Text = "toolStripButton2";
             this.forwardButton.Click += new System.EventHandler(this.ForwardButton_Click);
             // 
@@ -484,14 +507,14 @@ namespace LiteManager
             this.upButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.upButton.Margin = new System.Windows.Forms.Padding(5, 1, 0, 2);
             this.upButton.Name = "upButton";
-            this.upButton.Size = new System.Drawing.Size(23, 22);
+            this.upButton.Size = new System.Drawing.Size(23, 24);
             this.upButton.Text = "toolStripButton3";
             this.upButton.Click += new System.EventHandler(this.UpButton_Click);
             // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 25);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 27);
             // 
             // addressBar
             // 
@@ -511,7 +534,7 @@ namespace LiteManager
             this.refreshButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.refreshButton.Margin = new System.Windows.Forms.Padding(5, 1, 0, 2);
             this.refreshButton.Name = "refreshButton";
-            this.refreshButton.Size = new System.Drawing.Size(23, 22);
+            this.refreshButton.Size = new System.Drawing.Size(23, 24);
             this.refreshButton.Text = "toolStripButton4";
             this.refreshButton.Click += new System.EventHandler(this.RefreshToolStripMenuItem_Click);
             // 
@@ -520,8 +543,10 @@ namespace LiteManager
             this.searchToolStripComboBox.BackColor = System.Drawing.Color.White;
             this.searchToolStripComboBox.FlatStyle = System.Windows.Forms.FlatStyle.Standard;
             this.searchToolStripComboBox.Name = "searchToolStripComboBox";
-            this.searchToolStripComboBox.Size = new System.Drawing.Size(170, 25);
+            this.searchToolStripComboBox.Size = new System.Drawing.Size(170, 23);
             this.searchToolStripComboBox.Text = "Search";
+            this.searchToolStripComboBox.ToolTipText = "Search";
+            this.searchToolStripComboBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.SearchToolStripComboBox_KeyDown);
             // 
             // columnHeaderName
             // 
@@ -560,7 +585,7 @@ namespace LiteManager
             this.fileListView.FullRowSelect = true;
             this.fileListView.HideSelection = false;
             this.fileListView.LabelEdit = true;
-            this.fileListView.Location = new System.Drawing.Point(233, 49);
+            this.fileListView.Location = new System.Drawing.Point(233, 51);
             this.fileListView.Margin = new System.Windows.Forms.Padding(100, 3, 4, 3);
             this.fileListView.MinimumSize = new System.Drawing.Size(200, 390);
             this.fileListView.Name = "fileListView";
@@ -583,10 +608,10 @@ namespace LiteManager
             // splitter1
             // 
             this.splitter1.BackColor = System.Drawing.SystemColors.Control;
-            this.splitter1.Location = new System.Drawing.Point(233, 49);
+            this.splitter1.Location = new System.Drawing.Point(233, 51);
             this.splitter1.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.splitter1.Name = "splitter1";
-            this.splitter1.Size = new System.Drawing.Size(2, 390);
+            this.splitter1.Size = new System.Drawing.Size(2, 388);
             this.splitter1.TabIndex = 0;
             this.splitter1.TabStop = false;
             // 
@@ -595,10 +620,10 @@ namespace LiteManager
             this.panelForImagePreview.BackColor = System.Drawing.Color.White;
             this.panelForImagePreview.Controls.Add(this.pictureBoxPreview);
             this.panelForImagePreview.Dock = System.Windows.Forms.DockStyle.Right;
-            this.panelForImagePreview.Location = new System.Drawing.Point(734, 49);
+            this.panelForImagePreview.Location = new System.Drawing.Point(734, 51);
             this.panelForImagePreview.MinimumSize = new System.Drawing.Size(200, 100);
             this.panelForImagePreview.Name = "panelForImagePreview";
-            this.panelForImagePreview.Size = new System.Drawing.Size(250, 390);
+            this.panelForImagePreview.Size = new System.Drawing.Size(250, 388);
             this.panelForImagePreview.TabIndex = 0;
             this.panelForImagePreview.Visible = false;
             // 
@@ -608,7 +633,7 @@ namespace LiteManager
             this.pictureBoxPreview.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pictureBoxPreview.Location = new System.Drawing.Point(0, 0);
             this.pictureBoxPreview.Name = "pictureBoxPreview";
-            this.pictureBoxPreview.Size = new System.Drawing.Size(250, 390);
+            this.pictureBoxPreview.Size = new System.Drawing.Size(250, 388);
             this.pictureBoxPreview.TabIndex = 0;
             this.pictureBoxPreview.TabStop = false;
             this.pictureBoxPreview.SizeChanged += new System.EventHandler(this.PictureBoxPreview_SizeChanged);
@@ -616,34 +641,11 @@ namespace LiteManager
             // splitter2
             // 
             this.splitter2.Dock = System.Windows.Forms.DockStyle.Right;
-            this.splitter2.Location = new System.Drawing.Point(732, 49);
+            this.splitter2.Location = new System.Drawing.Point(732, 51);
             this.splitter2.Name = "splitter2";
-            this.splitter2.Size = new System.Drawing.Size(2, 390);
+            this.splitter2.Size = new System.Drawing.Size(2, 388);
             this.splitter2.TabIndex = 0;
             this.splitter2.TabStop = false;
-            // 
-            // newToolStripMenuItem
-            // 
-            this.newToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.newFolderToolStripMenuItem,
-            this.newFileToolStripMenuItem});
-            this.newToolStripMenuItem.Name = "newToolStripMenuItem";
-            this.newToolStripMenuItem.Size = new System.Drawing.Size(150, 22);
-            this.newToolStripMenuItem.Text = "New";
-            // 
-            // newFolderToolStripMenuItem
-            // 
-            this.newFolderToolStripMenuItem.Name = "newFolderToolStripMenuItem";
-            this.newFolderToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.newFolderToolStripMenuItem.Text = "New Folder";
-            this.newFolderToolStripMenuItem.Click += new System.EventHandler(this.NewFolderToolStripMenuItem_Click);
-            // 
-            // newFileToolStripMenuItem
-            // 
-            this.newFileToolStripMenuItem.Name = "newFileToolStripMenuItem";
-            this.newFileToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.newFileToolStripMenuItem.Text = "New File";
-            this.newFileToolStripMenuItem.Click += new System.EventHandler(this.NewFileToolStripMenuItem_Click);
             // 
             // MainForm
             // 
