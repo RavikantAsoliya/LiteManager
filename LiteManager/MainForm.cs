@@ -2109,7 +2109,7 @@ namespace LiteManager
                     try
                     {
                         // Check if the file name contains the search query
-                        if (file.Name.Contains(searchQuery))
+                        if (file.Name.ToLower().Contains(searchQuery.ToLower()))
                         {
                             // Add the file to the ListView
                             AddItemToListView(file.FullName, true);
@@ -2128,7 +2128,7 @@ namespace LiteManager
                     try
                     {
                         // Check if the folder name contains the search query
-                        if (folder.Name.Contains(searchQuery))
+                        if (folder.Name.ToLower().Contains(searchQuery.ToLower()))
                         {
                             // Add the folder to the ListView
                             AddItemToListView(folder.FullName, false);
